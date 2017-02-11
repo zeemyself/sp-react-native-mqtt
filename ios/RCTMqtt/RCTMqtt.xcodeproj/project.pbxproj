@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A841BE22E98C6742FF425184 /* libPods-RCTMqtt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B55C262163796F269BAA3909 /* libPods-RCTMqtt.a */; };
 		D20012C61E4FA06500CE2854 /* Mqtt.m in Sources */ = {isa = PBXBuildFile; fileRef = D20012C51E4FA06500CE2854 /* Mqtt.m */; };
+		D22753771E4FC1C1009AB3F8 /* libSocketRocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D22753761E4FC1C1009AB3F8 /* libSocketRocket.a */; };
 		D2F42A421E4FBD7C00343251 /* libMQTTClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D218D27B1E4F7EE2000D8F51 /* libMQTTClient.a */; };
 		FF7A9D4E1C64788B006743BA /* RCTMqtt.m in Sources */ = {isa = PBXBuildFile; fileRef = FF7A9D4C1C64788B006743BA /* RCTMqtt.m */; };
 /* End PBXBuildFile section */
@@ -27,6 +28,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = B970A7F185BF945A74ADFEE2441A7F5B;
 			remoteInfo = "Pods-RCTMqtt";
+		};
+		D22753751E4FC1C1009AB3F8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D218D2741E4F7EE1000D8F51 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8BA2FB05B17409076B33A55A70DFB4CC;
+			remoteInfo = SocketRocket;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -59,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D22753771E4FC1C1009AB3F8 /* libSocketRocket.a in Frameworks */,
 				D2F42A421E4FBD7C00343251 /* libMQTTClient.a in Frameworks */,
 				A841BE22E98C6742FF425184 /* libPods-RCTMqtt.a in Frameworks */,
 			);
@@ -89,6 +98,7 @@
 			children = (
 				D218D27B1E4F7EE2000D8F51 /* libMQTTClient.a */,
 				D218D27D1E4F7EE2000D8F51 /* libPods-RCTMqtt.a */,
+				D22753761E4FC1C1009AB3F8 /* libSocketRocket.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -187,6 +197,13 @@
 			fileType = archive.ar;
 			path = "libPods-RCTMqtt.a";
 			remoteRef = D218D27C1E4F7EE2000D8F51 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		D22753761E4FC1C1009AB3F8 /* libSocketRocket.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSocketRocket.a;
+			remoteRef = D22753751E4FC1C1009AB3F8 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
