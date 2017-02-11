@@ -6,20 +6,15 @@
 //  Copyright © 2016 Tuan PM. All rights reserved.
 //
 
-#import "RCTMqtt.h"
-#import "RCTBridgeModule.h"
-#import "RCTLog.h"
-#import "RCTUtils.h"
-#import "RCTEventDispatcher.h"
+#import <React/RCTBridgeModule.h>
+#import <React/RCTLog.h>
+#import <React/RCTUtils.h>
+#import <React/RCTEventDispatcher.h>
 
-#import <MQTTClient/MQTTClient.h>
-#import <MQTTClient/MQTTSessionManager.h>
-#import <CocoaLumberjack/CocoaLumberjack.h>
+#import "RCTMqtt.h"
 #import "Mqtt.h"
 
-@interface RCTMqtt : NSObject<RCTBridgeModule>
 
-@end
 
 @interface RCTMqtt ()
 @property NSMutableDictionary *clients;
@@ -42,8 +37,6 @@ RCT_EXPORT_MODULE();
 - (instancetype)init
 {
     if ((self = [super init])) {
-        [DDLog addLogger:[DDASLLogger sharedInstance]];
-        [DDLog addLogger:[DDTTYLogger sharedInstance]];
         
         NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
         
@@ -97,7 +90,7 @@ RCT_EXPORT_METHOD(disconnect:(nonnull NSNumber *) clientRef) {
 }
 
 RCT_EXPORT_METHOD(subscribe:(nonnull NSNumber *) clientRef topic:(NSString *)topic qos:(nonnull NSNumber *)qos) {
-    [[[self clients] objectForKey:clientRef] subscribe:topic qos:qos]];
+    [[[self clients] objectForKey:clientRef] subscribe:topic qos:qos];
     
 }
 

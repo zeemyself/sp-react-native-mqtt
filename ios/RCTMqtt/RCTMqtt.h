@@ -6,3 +6,8 @@
 //  Copyright © 2016 Tuan PM. All rights reserved.
 //
 #import <Foundation/Foundation.h>
+#import <React/RCTBridgeModule.h>
+
+@interface RCTMqtt : NSObject<RCTBridgeModule>
+
+@end
