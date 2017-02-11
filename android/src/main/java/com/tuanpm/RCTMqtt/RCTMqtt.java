@@ -1,62 +1,43 @@
 package com.tuanpm.RCTMqtt;
 
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
-import android.os.AsyncTask;
-import android.os.Bundle;
 
+import com.facebook.react.*;
 import com.facebook.react.bridge.*;
 
 import javax.annotation.Nullable;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import javax.net.ssl.*;
+
+import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-//import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-//import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 
-public class RCTMqtt implements MqttCallback{
+public class RCTMqtt implements MqttCallback
+{
 	private static final String TAG = "RCTMqttModule";
 	private final ReactApplicationContext _reactContext;
 	private final WritableMap defaultOptions;
 	private final int clientRef;
-  MqttAsyncClient   client;
-  MemoryPersistence memPer;
-  MqttConnectOptions mqttoptions;
+	MqttAsyncClient   client;
+	MemoryPersistence memPer;
+	MqttConnectOptions mqttoptions;
 
 
 	public RCTMqtt(int ref, ReactApplicationContext reactContext, final ReadableMap _options) {
@@ -289,17 +270,30 @@ public class RCTMqtt implements MqttCallback{
 	  }
 	}
 
-
-	public void publish(final String topic, final String payload, final int qos, final boolean retain) {
-    byte[] encodedPayload = new byte[0];
-    try {
-        encodedPayload = payload.getBytes("UTF-8");
-        MqttMessage message = new MqttMessage(encodedPayload);
-        client.publish(topic, message);
-    } catch (UnsupportedEncodingException | MqttException e) {
-        e.printStackTrace();
-    }
-  }
+	/**
+	 * TODO: WTF!? why don't use qos and retain
+	 * @param topic
+	 * @param payload
+	 * @param qos
+	 * @param retain
+	 */
+	public void publish(final String topic,
+						final String payload,
+						final int qos,
+						final boolean retain)
+	{
+		byte[] encodedPayload;
+		try
+		{
+			encodedPayload = payload.getBytes("UTF-8");
+			MqttMessage message = new MqttMessage(encodedPayload);
+			client.publish(topic, message);
+		}
+		catch (UnsupportedEncodingException | MqttException e)
+		{
+			e.printStackTrace();
+		}
+	}
 
    /****************************************************************/
   /* Methods to implement the MqttCallback interface              */
@@ -367,9 +361,12 @@ public class RCTMqtt implements MqttCallback{
      * Utility method to handle logging. If 'quietMode' is set, this method does nothing
      * @param message the message to log
      */
-    void log(String message) {
-      Log.d(TAG, message);
-    }
-   
-
+   void log(String message)
+   {
+	   if (!BuildConfig.DEBUG)
+	   {
+		   return;
+	   }
+	   Log.d(TAG, message);
+   }
 }
