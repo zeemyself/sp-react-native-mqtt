@@ -302,7 +302,7 @@ public class RCTMqtt
             public void onFailure(IMqttToken asyncActionToken,
                                   Throwable exception)
             {
-                log("Disconnect failed" + exception);
+                log(new StringBuilder("Disconnect failed").append(exception).toString());
             }
         };
 
@@ -349,8 +349,6 @@ public class RCTMqtt
     }
 
     /**
-     * TODO: WTF!? why don't use qos and retain
-     *
      * @param topic
      * @param payload
      * @param qos
@@ -361,11 +359,12 @@ public class RCTMqtt
                         final int qos,
                         final boolean retain)
     {
-        byte[] encodedPayload;
         try
         {
-            encodedPayload = payload.getBytes("UTF-8");
+            byte[] encodedPayload = payload.getBytes("UTF-8");
             MqttMessage message = new MqttMessage(encodedPayload);
+            message.setQos(qos);
+            message.setRetained(retain);
             client.publish(topic, message);
         }
         catch (UnsupportedEncodingException | MqttException e)
@@ -386,7 +385,7 @@ public class RCTMqtt
         // Called when the connection to the server has been lost.
         // An application may choose to implement reconnection
         // logic at this point. This sample simply exits.
-        log("Connection to lost! " + cause);
+        log(new StringBuilder("Connection to lost! ").append(cause).toString());
         WritableMap params = Arguments.createMap();
         params.putString("event", "closed");
         params.putString("message", "Connection to lost!");

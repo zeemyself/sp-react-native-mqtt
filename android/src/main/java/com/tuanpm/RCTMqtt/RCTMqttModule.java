@@ -28,7 +28,7 @@ public class RCTMqttModule
     {
         super(reactContext);
         _reactContext = reactContext;
-        clients = new HashMap<Integer, RCTMqtt>();
+        clients = new HashMap<>();
     }
 
     public static int randInt(int min,
