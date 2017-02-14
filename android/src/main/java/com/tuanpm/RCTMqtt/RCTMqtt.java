@@ -9,7 +9,7 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.modules.core.RCTNativeAppEventEmitter;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -25,6 +25,14 @@ import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
@@ -35,20 +43,20 @@ public class RCTMqtt
         implements MqttCallback
 {
     private static final String TAG = "RCTMqttModule";
-    private final ReactApplicationContext _reactContext;
+    private final ReactApplicationContext reactContext;
     private final WritableMap defaultOptions;
-    private final int clientRef;
-    MqttAsyncClient client;
-    MemoryPersistence memPer;
-    MqttConnectOptions mqttoptions;
+    private final String clientRef;
+    private MqttAsyncClient client;
+    private MemoryPersistence memPer;
+    private MqttConnectOptions mqttOptions;
+    private Map<String, Integer> topics = new HashMap<>();
 
-
-    public RCTMqtt(final int ref,
+    public RCTMqtt(@NonNull final String ref,
                    final ReactApplicationContext reactContext,
                    final ReadableMap options)
     {
         clientRef = ref;
-        _reactContext = reactContext;
+        this.reactContext = reactContext;
         defaultOptions = new WritableNativeMap();
         defaultOptions.putString("host", "localhost");
         defaultOptions.putInt("port", 1883);
@@ -63,7 +71,6 @@ public class RCTMqtt
         defaultOptions.putString("pass", "");
         defaultOptions.putBoolean("will", false);
         defaultOptions.putInt("protocolLevel", 4);
-        defaultOptions.putBoolean("will", false);
         defaultOptions.putString("willMsg", "");
         defaultOptions.putString("willtopic", "");
         defaultOptions.putInt("willQos", 0);
@@ -153,14 +160,14 @@ public class RCTMqtt
         // Set this wrapper as the callback handler
 
 
-        mqttoptions = new MqttConnectOptions();
+        mqttOptions = new MqttConnectOptions();
 
         if (options.getInt("protocolLevel") == 3)
         {
-            mqttoptions.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1);
+            mqttOptions.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1);
         }
 
-        mqttoptions.setKeepAliveInterval(options.getInt("keepalive"));
+        mqttOptions.setKeepAliveInterval(options.getInt("keepalive"));
 
         StringBuilder uri = new StringBuilder("tcp://");
         if (options.getBoolean("tls"))
@@ -197,7 +204,7 @@ public class RCTMqtt
                     }
                 }}, new SecureRandom());
 
-                mqttoptions.setSocketFactory(sslContext.getSocketFactory());
+                mqttOptions.setSocketFactory(sslContext.getSocketFactory());
             }
             catch (Exception e)
             {
@@ -213,11 +220,11 @@ public class RCTMqtt
             String pass = options.getString("pass");
             if (user.length() > 0)
             {
-                mqttoptions.setUserName(user);
+                mqttOptions.setUserName(user);
             }
             if (pass.length() > 0)
             {
-                mqttoptions.setPassword(pass.toCharArray());
+                mqttOptions.setPassword(pass.toCharArray());
             }
         }
 
@@ -244,28 +251,32 @@ public class RCTMqtt
     }
 
 
-    private void sendEvent(final ReactContext reactContext,
-                           final String eventName,
-                           @Nullable WritableMap params)
-    {
-        params.putInt("clientRef", this.clientRef);
-        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
-    }
-
     public void connect()
     {
         try
         {
+            WritableMap params = Arguments.createMap();
+            params.putString("event", "connecting");
+            params.putString("message", "try to connect");
+            sendEvent(reactContext, "mqtt_events", params);
+
             // Connect using a non-blocking connect
-            client.connect(mqttoptions, _reactContext, new IMqttActionListener()
+            client.connect(mqttOptions, reactContext, new IMqttActionListener()
             {
                 public void onSuccess(IMqttToken asyncActionToken)
                 {
                     WritableMap params = Arguments.createMap();
                     params.putString("event", "connect");
                     params.putString("message", "connected");
-                    sendEvent(_reactContext, "mqtt_events", params);
+                    sendEvent(reactContext, "mqtt_events", params);
                     log("Connected");
+
+                    Iterator<String> iterator = topics.keySet().iterator();
+                    while(iterator.hasNext())
+                    {
+                        final String topic = iterator.next();
+                        subscribe(topic, topics.get(topic));
+                    }
                 }
 
                 public void onFailure(IMqttToken asyncActionToken,
@@ -273,8 +284,11 @@ public class RCTMqtt
                 {
                     WritableMap params = Arguments.createMap();
                     params.putString("event", "error");
-                    params.putString("message", "connection failure");
-                    sendEvent(_reactContext, "mqtt_events", params);
+                    final String errorDescription = new StringBuilder("connection failure ")
+                            .append(exception).toString();
+                    params.putString("message", errorDescription);
+                    sendEvent(reactContext, "mqtt_events", params);
+                    reconnectIfNeeded(exception);
                 }
             });
         }
@@ -283,7 +297,7 @@ public class RCTMqtt
             WritableMap params = Arguments.createMap();
             params.putString("event", "error");
             params.putString("message", "Can't create connection");
-            sendEvent(_reactContext, "mqtt_events", params);
+            sendEvent(reactContext, "mqtt_events", params);
         }
     }
 
@@ -297,7 +311,7 @@ public class RCTMqtt
                 WritableMap params = Arguments.createMap();
                 params.putString("event", "closed");
                 params.putString("message", "Disconnect");
-                sendEvent(_reactContext, "mqtt_events", params);
+                sendEvent(reactContext, "mqtt_events", params);
             }
 
             public void onFailure(IMqttToken asyncActionToken,
@@ -309,7 +323,7 @@ public class RCTMqtt
 
         try
         {
-            client.disconnect(_reactContext, discListener);
+            client.disconnect(reactContext, discListener);
         }
         catch (MqttException e)
         {
@@ -322,6 +336,7 @@ public class RCTMqtt
     {
         try
         {
+            topics.put(topic, qos);
             IMqttToken subToken = client.subscribe(topic, qos);
             subToken.setActionCallback(new IMqttActionListener()
             {
@@ -353,6 +368,9 @@ public class RCTMqtt
     {
         try
         {
+            if (topics.containsKey(topic)) {
+                topics.remove(topic);
+            }
             client.unsubscribe(topic).setActionCallback(new IMqttActionListener()
             {
                 @Override
@@ -415,9 +433,12 @@ public class RCTMqtt
         // logic at this point. This sample simply exits.
         log(new StringBuilder("Connection to lost! ").append(cause).toString());
         WritableMap params = Arguments.createMap();
-        params.putString("event", "closed");
-        params.putString("message", "Connection to lost!");
-        sendEvent(_reactContext, "mqtt_events", params);
+        params.putString("event", "error");
+        final String errorDescription = new StringBuilder("Connection to lost! ")
+                .append(cause).toString();
+        params.putString("message", errorDescription);
+        sendEvent(reactContext, "mqtt_events", params);
+        reconnectIfNeeded(cause);
     }
 
     /**
@@ -463,7 +484,61 @@ public class RCTMqtt
         WritableMap params = Arguments.createMap();
         params.putString("event", "message");
         params.putMap("message", data);
-        sendEvent(_reactContext, "mqtt_events", params);
+        sendEvent(reactContext, "mqtt_events", params);
+    }
+
+    private void sendEvent(final ReactContext reactContext,
+                           final String eventName,
+                           @Nullable WritableMap params)
+    {
+        params.putString("clientRef", this.clientRef);
+        reactContext.getJSModule(RCTNativeAppEventEmitter.class).emit(eventName, params);
+    }
+
+    private boolean needToReconnect(@NonNull final MqttException exception)
+    {
+        int reasonCode = exception.getReasonCode();
+        return reasonCode == MqttException.REASON_CODE_SERVER_CONNECT_ERROR ||
+                reasonCode == MqttException.REASON_CODE_CLIENT_EXCEPTION ||
+                reasonCode == MqttException.REASON_CODE_CONNECTION_LOST;
+    }
+
+    private void reconnectIfNeeded(@NonNull final Throwable cause)
+    {
+        if (!(cause instanceof MqttException))
+        {
+            final String notMqttExceptionError = new StringBuilder("Not MqttException ")
+                            .append(cause).toString();
+            log(notMqttExceptionError);
+            return;
+        }
+
+        final MqttException mqttError = (MqttException) cause;
+
+        if (!needToReconnect(mqttError))
+        {
+            final String noNeedToReconnect = new StringBuilder("No need to reconnect ")
+                            .append(mqttError.getReasonCode()).toString();
+            log(noNeedToReconnect);
+            return;
+        }
+
+        final String timerName = new StringBuilder("reconnect-")
+                .append(UUID.randomUUID().toString())
+                .toString();
+
+        final Timer timer = new Timer(timerName);
+        timer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                log("[ MQTT ] reconnect");
+                connect();
+                timer.cancel();
+                timer.purge();
+            }
+        }, TimeUnit.SECONDS.toMillis(5));
     }
 
     /**
@@ -471,7 +546,7 @@ public class RCTMqtt
      *
      * @param message the message to log
      */
-    void log(@NonNull final String message)
+    private void log(@NonNull final String message)
     {
         if (!BuildConfig.DEBUG)
         {
