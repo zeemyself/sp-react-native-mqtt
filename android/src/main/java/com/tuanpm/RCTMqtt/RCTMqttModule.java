@@ -5,6 +5,7 @@
 package com.tuanpm.RCTMqtt;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.react.bridge.Promise;
@@ -82,10 +83,17 @@ public class RCTMqttModule
 
     @ReactMethod
     public void subscribe(final int clientRef,
-                          final String topic,
+                          final @NonNull String topic,
                           final int qos)
     {
         clients.get(clientRef).subscribe(topic, qos);
+    }
+
+    @ReactMethod
+    public void unsubscribe(final int clientRef,
+                            final @NonNull String topic)
+    {
+        clients.get(clientRef).unsubscribe(topic);
     }
 
     @ReactMethod

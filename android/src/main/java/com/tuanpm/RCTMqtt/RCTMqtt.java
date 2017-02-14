@@ -1,5 +1,6 @@
 package com.tuanpm.RCTMqtt;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -71,7 +72,7 @@ public class RCTMqtt
         createClient(options);
     }
 
-    private void createClient(final ReadableMap params)
+    private void createClient(@NonNull final ReadableMap params)
     {
         if (params.hasKey("host"))
         {
@@ -316,7 +317,7 @@ public class RCTMqtt
         }
     }
 
-    public void subscribe(final String topic,
+    public void subscribe(@NonNull final String topic,
                           final int qos)
     {
         try
@@ -348,14 +349,41 @@ public class RCTMqtt
         }
     }
 
+    public void unsubscribe(@NonNull final String topic)
+    {
+        try
+        {
+            client.unsubscribe(topic).setActionCallback(new IMqttActionListener()
+            {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken)
+                {
+                    log(new StringBuilder("Subscribed on ").append(topic).toString());
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken,
+                                      Throwable exception)
+                {
+                    log(new StringBuilder("Failed to subscribe on ").append(topic).toString());
+                }
+            });
+        }
+        catch (MqttException e)
+        {
+            log(new StringBuilder("Can't unsubscribe").append(" ").append(topic).toString());
+            e.printStackTrace();
+        }
+    }
+
     /**
      * @param topic
      * @param payload
      * @param qos
      * @param retain
      */
-    public void publish(final String topic,
-                        final String payload,
+    public void publish(@NonNull final String topic,
+                        @NonNull final String payload,
                         final int qos,
                         final boolean retain)
     {
@@ -417,8 +445,8 @@ public class RCTMqtt
     /**
      * @see MqttCallback#messageArrived(String, MqttMessage)
      */
-    public void messageArrived(final String topic,
-                               final MqttMessage message) throws
+    public void messageArrived(@NonNull final String topic,
+                               @NonNull final MqttMessage message) throws
             MqttException
     {
         // Called when a message arrives from the server that matches any
@@ -443,12 +471,13 @@ public class RCTMqtt
      *
      * @param message the message to log
      */
-    void log(String message)
+    void log(@NonNull final String message)
     {
         if (!BuildConfig.DEBUG)
         {
             return;
         }
-        Log.d(TAG, message);
+        final String tag = new StringBuilder(TAG).append(" ").append(clientRef).toString();
+        Log.d(tag, message);
     }
 }
