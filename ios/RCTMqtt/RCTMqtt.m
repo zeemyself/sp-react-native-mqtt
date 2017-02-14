@@ -37,30 +37,9 @@ RCT_EXPORT_MODULE();
 - (instancetype)init
 {
     if ((self = [super init])) {
-        
-        NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-        
         _clients = [[NSMutableDictionary alloc] init];
-        
-        [defaultCenter addObserver:self
-                          selector:@selector(appDidBecomeActive)
-                              name:UIApplicationDidBecomeActiveNotification
-                            object:nil];
-        
-        
-        
     }
     return self;
-    
-}
-
-- (void)appDidBecomeActive {
-    //    if(self.isConnect) {
-    //        [self.manager addObserver:self
-    //                       forKeyPath:@"state"
-    //                          options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
-    //                          context:nil];
-    //    }
     
 }
 
@@ -79,9 +58,7 @@ RCT_EXPORT_METHOD(createClient:(NSDictionary *) options
     
 }
 RCT_EXPORT_METHOD(connect:(nonnull NSNumber *) clientRef) {
-    
     [[[self clients] objectForKey:clientRef] connect];
-    
 }
 
 
@@ -94,7 +71,7 @@ RCT_EXPORT_METHOD(subscribe:(nonnull NSNumber *) clientRef topic:(NSString *)top
 }
 
 RCT_EXPORT_METHOD(unsubscribe:(nonnull NSNumber *) clientRef topic:(NSString *)topic) {
-    [[[self clients] objectForKey:clientRef] unsubscribe:topic qos:qos];
+    [[[self clients] objectForKey:clientRef] unsubscribe:topic];
 }
 
 RCT_EXPORT_METHOD(publish:(nonnull NSNumber *) clientRef topic:(NSString *)topic data:(NSString*)data qos:(nonnull NSNumber *)qos retain:(BOOL)retain) {
@@ -102,13 +79,11 @@ RCT_EXPORT_METHOD(publish:(nonnull NSNumber *) clientRef topic:(NSString *)topic
                                                 data:[data dataUsingEncoding:NSUTF8StringEncoding]
                                                  qos:qos
                                               retain:retain];
-
+    
 }
 
 - (void)dealloc
 {
-
-
 }
 
 @end

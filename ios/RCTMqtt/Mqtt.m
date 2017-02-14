@@ -14,7 +14,6 @@
 @property (strong, nonatomic) MQTTSessionManager *manager;
 @property (nonatomic, strong) NSDictionary *defaultOptions;
 @property (nonatomic, retain) NSMutableDictionary *options;
-@property BOOL isConnect;
 @property int clientRef;
 @property (nonatomic, strong) RCTBridge * bridge;
 
@@ -43,9 +42,9 @@
                                 @"willQos": @0,
                                 @"willRetainFlag": @NO
                                 };
-
+        
     }
-
+    
     return self;
 }
 
@@ -61,7 +60,7 @@
     }
     self.manager = [[MQTTSessionManager alloc] init];
     self.manager.delegate = self;
-
+    
     return self;
 }
 
@@ -71,7 +70,7 @@
         securityPolicy = [MQTTSSLSecurityPolicy policyWithPinningMode:MQTTSSLPinningModeNone];
         securityPolicy.allowInvalidCertificates = YES;
     }
-
+    
     NSData *willMsg = nil;
     if(self.options[@"willMsg"] != [NSNull null]) {
         willMsg = [self.options[@"willMsg"] dataUsingEncoding:NSUTF8StringEncoding];
@@ -172,7 +171,7 @@
                                                                    @"retain": [NSNumber numberWithBool:retained]
                                                                    }
                                                            }];
-
+    
 }
 
 
