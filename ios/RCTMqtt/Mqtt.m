@@ -48,9 +48,9 @@
     return self;
 }
 
-- (instancetype) initWithBrigde:(RCTEventEmitter *) emitter
-                        options:(NSDictionary *) options
-                      clientRef:(int) clientRef {
+- (instancetype) initWithEmitter:(RCTEventEmitter *) emitter
+                         options:(NSDictionary *) options
+                       clientRef:(int) clientRef {
     self = [self init];
     self.emitter = emitter;
     self.clientRef = clientRef;
@@ -58,7 +58,7 @@
     for (NSString *key in options.keyEnumerator) { // Replace default options
         [self.options setValue:options[key] forKey:key];
     }
-    self.manager = [[MQTTSessionManager alloc] init];
+    self.manager = [[MQTTSessionManager alloc] initWithPersistence:NO maxWindowSize:MQTT_MAX_WINDOW_SIZE maxMessages:MQTT_MAX_MESSAGES maxSize:MQTT_MAX_SIZE];
     self.manager.delegate = self;
     
     return self;
@@ -75,23 +75,25 @@
     if(self.options[@"willMsg"] != [NSNull null]) {
         willMsg = [self.options[@"willMsg"] dataUsingEncoding:NSUTF8StringEncoding];
     }
-    [self.manager connectTo:[self.options valueForKey:@"host"]
-                       port:[self.options[@"port"] intValue]
-                        tls:[self.options[@"tls"] boolValue]
-                  keepalive:[self.options[@"keepalive"] intValue]
-                      clean:[self.options[@"clean"] intValue]
-                       auth:[self.options[@"auth"] boolValue]
-                       user:[self.options valueForKey:@"user"]
-                       pass:[self.options valueForKey:@"pass"]
-                       will:[self.options[@"will"] boolValue]
-                  willTopic:[self.options valueForKey:@"willTopic"]
-                    willMsg:willMsg
-                    willQos:(MQTTQosLevel)[self.options[@"willQos"] intValue]
-             willRetainFlag:[self.options[@"willRetainFlag"] boolValue]
-               withClientId:[self.options valueForKey:@"clientId"]
-             securityPolicy:securityPolicy
-               certificates:nil
-     ];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self.manager connectTo:[self.options valueForKey:@"host"]
+                           port:[self.options[@"port"] intValue]
+                            tls:[self.options[@"tls"] boolValue]
+                      keepalive:[self.options[@"keepalive"] intValue]
+                          clean:[self.options[@"clean"] intValue]
+                           auth:[self.options[@"auth"] boolValue]
+                           user:[self.options valueForKey:@"user"]
+                           pass:[self.options valueForKey:@"pass"]
+                           will:[self.options[@"will"] boolValue]
+                      willTopic:[self.options valueForKey:@"willTopic"]
+                        willMsg:willMsg
+                        willQos:(MQTTQosLevel)[self.options[@"willQos"] intValue]
+                 willRetainFlag:[self.options[@"willRetainFlag"] boolValue]
+                   withClientId:[self.options valueForKey:@"clientId"]
+                 securityPolicy:securityPolicy
+                   certificates:nil
+         ];
+    }];
 }
 
 - (void)sessionManager:(MQTTSessionManager *)sessonManager didChangeState:(MQTTSessionManagerState)newState {
@@ -161,7 +163,6 @@
 
 - (void)handleMessage:(NSData *)data onTopic:(NSString *)topic retained:(BOOL)retained {
     NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    
     [self.emitter sendEventWithName:@"mqtt_events"
                                body:@{
                                       @"event": @"message",

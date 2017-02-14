@@ -42,9 +42,7 @@ RCT_EXPORT_MODULE();
 }
 
 - (NSArray<NSString *> *)supportedEvents {
-    return @[
-             @"mqtt_events"
-             ];
+    return @[ @"mqtt_events" ];
 }
 
 RCT_EXPORT_METHOD(createClient:(NSDictionary *) options
@@ -53,14 +51,19 @@ RCT_EXPORT_METHOD(createClient:(NSDictionary *) options
     
     int clientRef = [self getRandomNumberBetween:1000 to:9999];
     
-    Mqtt *client = [[Mqtt alloc] initWithBrigde:[self bridge]
-                                        options:options
-                                      clientRef:clientRef];
+    Mqtt *client = [[Mqtt alloc] initWithEmitter:self
+                                         options:options
+                                       clientRef:clientRef];
     
     [[self clients] setObject:client forKey:[NSNumber numberWithInt:clientRef]];
     resolve([NSNumber numberWithInt:clientRef]);
     
 }
+
+RCT_EXPORT_METHOD(removeClient:(nonnull NSNumber *) clientRef) {
+    [[self clients] removeObjectForKey:clientRef];
+}
+
 RCT_EXPORT_METHOD(connect:(nonnull NSNumber *) clientRef) {
     [[[self clients] objectForKey:clientRef] connect];
 }

@@ -16,9 +16,9 @@
 
 @interface Mqtt : NSObject <MQTTSessionManagerDelegate>
 
-- (Mqtt*) initWithBrigde:(RCTEventEmitter *) emitter
-                 options:(NSDictionary *) options
-               clientRef:(int) clientRef;
+- (Mqtt*) initWithEmitter:(RCTEventEmitter *) emitter
+                  options:(NSDictionary *) options
+                clientRef:(int) clientRef;
 - (void) connect;
 - (void) disconnect;
 - (void) subscribe:(NSString *)topic qos:(NSNumber *)qos;

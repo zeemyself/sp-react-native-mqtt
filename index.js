@@ -1,5 +1,5 @@
 import {
-  DeviceEventEmitter,
+  NativeEventEmitter,
   NativeModules
 } from 'react-native';
 
@@ -46,6 +46,8 @@ MqttClient.prototype.publish = function(topic, payload, qos, retain) {
   Mqtt.publish(this.clientRef, topic, payload, qos, retain);
 }
 
+const emitter = new NativeEventEmitter(Mqtt)
+
 module.exports = {
   clients: [],
   eventHandler: null,
@@ -83,7 +85,7 @@ module.exports = {
     /* Listen mqtt event */
     if(this.eventHandler === null) {
       console.log('add mqtt_events listener')
-      this.eventHandler = DeviceEventEmitter.addListener(
+      this.eventHandler = emitter.addListener(
         "mqtt_events",
         (data) => this.dispatchEvents(data));
     }
@@ -94,8 +96,6 @@ module.exports = {
   removeClient: function(client) {
     var clientIdx = this.clients.indexOf(client);
 
-    /* TODO: destroy client in native module */
-
     if(clientIdx > -1)
       this.clients.splice(clientIdx, 1);
 
@@ -103,6 +103,8 @@ module.exports = {
       this.eventHandler.remove();
       this.eventHandler = null;
     }
+
+    Mqtt.remove(client.clientRef);
   }
 
 };
