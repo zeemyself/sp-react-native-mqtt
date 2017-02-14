@@ -104,7 +104,7 @@ module.exports = {
       this.eventHandler = null;
     }
 
-    Mqtt.remove(client.clientRef);
+    Mqtt.removeClient(client.clientRef);
   }
 
 };
