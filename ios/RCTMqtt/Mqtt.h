@@ -6,7 +6,7 @@
 //  Copyright © 2016 Tuan PM. All rights reserved.
 //
 #import <Foundation/Foundation.h>
-#import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
 #import <MQTTClient/MQTTClient.h>
 #import <MQTTClient/MQTTSessionManager.h>
@@ -16,9 +16,9 @@
 
 @interface Mqtt : NSObject <MQTTSessionManagerDelegate>
 
-- (Mqtt*) initWithBrigde:(RCTBridge *) bridge
-                        options:(NSDictionary *) options
-                      clientRef:(int) clientRef;
+- (Mqtt*) initWithBrigde:(RCTEventEmitter *) emitter
+                 options:(NSDictionary *) options
+               clientRef:(int) clientRef;
 - (void) connect;
 - (void) disconnect;
 - (void) subscribe:(NSString *)topic qos:(NSNumber *)qos;

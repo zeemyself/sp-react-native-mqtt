@@ -23,8 +23,6 @@
 
 @implementation RCTMqtt
 
-@synthesize bridge = _bridge;
-
 
 -(int)getRandomNumberBetween:(int)from to:(int)to {
     
@@ -41,6 +39,12 @@ RCT_EXPORT_MODULE();
     }
     return self;
     
+}
+
+- (NSArray<NSString *> *)supportedEvents {
+    return @[
+             @"mqtt_events"
+             ];
 }
 
 RCT_EXPORT_METHOD(createClient:(NSDictionary *) options

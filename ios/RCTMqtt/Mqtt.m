@@ -7,7 +7,7 @@
 //
 
 #import "Mqtt.h"
-#import <React/RCTEventDispatcher.h>
+#import <React/RCTEventEmitter.h>
 
 @interface Mqtt ()
 
@@ -15,7 +15,7 @@
 @property (nonatomic, strong) NSDictionary *defaultOptions;
 @property (nonatomic, retain) NSMutableDictionary *options;
 @property int clientRef;
-@property (nonatomic, strong) RCTBridge * bridge;
+@property (nonatomic, strong) RCTEventEmitter * emitter;
 
 @end
 
@@ -48,11 +48,11 @@
     return self;
 }
 
-- (instancetype) initWithBrigde:(RCTBridge *) bridge
+- (instancetype) initWithBrigde:(RCTEventEmitter *) emitter
                         options:(NSDictionary *) options
                       clientRef:(int) clientRef {
     self = [self init];
-    self.bridge = bridge;
+    self.emitter = emitter;
     self.clientRef = clientRef;
     self.options = [NSMutableDictionary dictionaryWithDictionary:self.defaultOptions]; // Set default options
     for (NSString *key in options.keyEnumerator) { // Replace default options
@@ -96,40 +96,41 @@
 
 - (void)sessionManager:(MQTTSessionManager *)sessonManager didChangeState:(MQTTSessionManagerState)newState {
     switch (newState) {
+            
         case MQTTSessionManagerStateClosed:
-            [self.bridge.eventDispatcher sendDeviceEventWithName:@"mqtt_events"
-                                                            body:@{@"event": @"closed",
-                                                                   @"clientRef": [NSNumber numberWithInt:[self clientRef]],
-                                                                   @"message": @"closed"
-                                                                   }];
+            [self.emitter sendEventWithName:@"mqtt_events"
+                                       body:@{@"event": @"closed",
+                                              @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                              @"message": @"closed"
+                                              }];
             break;
         case MQTTSessionManagerStateClosing:
-            [self.bridge.eventDispatcher sendDeviceEventWithName:@"mqtt_events"
-                                                            body:@{@"event": @"closing",
-                                                                   @"clientRef": [NSNumber numberWithInt:[self clientRef]],
-                                                                   @"message": @"closing"
-                                                                   }];
+            [self.emitter sendEventWithName:@"mqtt_events"
+                                       body:@{@"event": @"closing",
+                                              @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                              @"message": @"closing"
+                                              }];
             break;
         case MQTTSessionManagerStateConnected:
-            [self.bridge.eventDispatcher sendDeviceEventWithName:@"mqtt_events"
-                                                            body:@{@"event": @"connect",
-                                                                   @"clientRef": [NSNumber numberWithInt:[self clientRef]],
-                                                                   @"message": @"connected"
-                                                                   }];
+            [self.emitter sendEventWithName:@"mqtt_events"
+                                       body:@{@"event": @"connect",
+                                              @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                              @"message": @"connected"
+                                              }];
             break;
         case MQTTSessionManagerStateConnecting:
-            [self.bridge.eventDispatcher sendDeviceEventWithName:@"mqtt_events"
-                                                            body:@{@"event": @"connecting",
-                                                                   @"clientRef": [NSNumber numberWithInt:[self clientRef]],
-                                                                   @"message": @"connecting"
-                                                                   }];
+            [self.emitter sendEventWithName:@"mqtt_events"
+                                       body:@{@"event": @"connecting",
+                                              @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                              @"message": @"connecting"
+                                              }];
             break;
         case MQTTSessionManagerStateError:
-            [self.bridge.eventDispatcher sendDeviceEventWithName:@"mqtt_events"
-                                                            body:@{@"event": @"error",
-                                                                   @"clientRef": [NSNumber numberWithInt:[self clientRef]],
-                                                                   @"message": @"error"
-                                                                   }];
+            [self.emitter sendEventWithName:@"mqtt_events"
+                                       body:@{@"event": @"error",
+                                              @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                              @"message": @"error"
+                                              }];
             break;
         case MQTTSessionManagerStateStarting:
         default:
@@ -160,17 +161,17 @@
 
 - (void)handleMessage:(NSData *)data onTopic:(NSString *)topic retained:(BOOL)retained {
     NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    //RCTLogInfo(@" %@ : %@", topic, dataString);
-    [self.bridge.eventDispatcher sendDeviceEventWithName:@"mqtt_events"
-                                                    body:@{
-                                                           @"event": @"message",
-                                                           @"clientRef": [NSNumber numberWithInt:[self clientRef]],
-                                                           @"message": @{
-                                                                   @"topic": topic,
-                                                                   @"data": dataString,
-                                                                   @"retain": [NSNumber numberWithBool:retained]
-                                                                   }
-                                                           }];
+    
+    [self.emitter sendEventWithName:@"mqtt_events"
+                               body:@{
+                                      @"event": @"message",
+                                      @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                      @"message": @{
+                                              @"topic": topic,
+                                              @"data": dataString,
+                                              @"retain": [NSNumber numberWithBool:retained]
+                                              }
+                                      }];
     
 }
 
@@ -179,7 +180,5 @@
 {
     [self disconnect];
 }
-
-
 
 @end
