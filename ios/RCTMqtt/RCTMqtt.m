@@ -24,11 +24,6 @@
 @implementation RCTMqtt
 
 
--(int)getRandomNumberBetween:(int)from to:(int)to {
-    
-    return (int)from + arc4random() % (to-from+1);
-}
-
 RCT_EXPORT_MODULE();
 
 
@@ -48,40 +43,39 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(createClient:(NSDictionary *) options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    
-    int clientRef = [self getRandomNumberBetween:1000 to:9999];
+   
+    NSString *clientRef = [[NSProcessInfo processInfo] globallyUniqueString]
     
     Mqtt *client = [[Mqtt alloc] initWithEmitter:self
                                          options:options
                                        clientRef:clientRef];
     
-    [[self clients] setObject:client forKey:[NSNumber numberWithInt:clientRef]];
-    resolve([NSNumber numberWithInt:clientRef]);
+    [[self clients] setObject:client forKey:clientRef];
+    resolve(clientRef]);
     
 }
 
-RCT_EXPORT_METHOD(removeClient:(nonnull NSNumber *) clientRef) {
+RCT_EXPORT_METHOD(removeClient:(nonnull NSString *) clientRef) {
     [[self clients] removeObjectForKey:clientRef];
 }
 
-RCT_EXPORT_METHOD(connect:(nonnull NSNumber *) clientRef) {
+RCT_EXPORT_METHOD(connect:(nonnull NSString *) clientRef) {
     [[[self clients] objectForKey:clientRef] connect];
 }
 
-
-RCT_EXPORT_METHOD(disconnect:(nonnull NSNumber *) clientRef) {
+RCT_EXPORT_METHOD(disconnect:(nonnull NSString *) clientRef) {
     [[[self clients] objectForKey:clientRef] disconnect];
 }
 
-RCT_EXPORT_METHOD(subscribe:(nonnull NSNumber *) clientRef topic:(NSString *)topic qos:(nonnull NSNumber *)qos) {
+RCT_EXPORT_METHOD(subscribe:(nonnull NSString *) clientRef topic:(NSString *)topic qos:(nonnull NSNumber *)qos) {
     [[[self clients] objectForKey:clientRef] subscribe:topic qos:qos];
 }
 
-RCT_EXPORT_METHOD(unsubscribe:(nonnull NSNumber *) clientRef topic:(NSString *)topic) {
+RCT_EXPORT_METHOD(unsubscribe:(nonnull NSString *) clientRef topic:(NSString *)topic) {
     [[[self clients] objectForKey:clientRef] unsubscribe:topic];
 }
 
-RCT_EXPORT_METHOD(publish:(nonnull NSNumber *) clientRef topic:(NSString *)topic data:(NSString*)data qos:(nonnull NSNumber *)qos retain:(BOOL)retain) {
+RCT_EXPORT_METHOD(publish:(nonnull NSString *) clientRef topic:(NSString *)topic data:(NSString*)data qos:(nonnull NSNumber *)qos retain:(BOOL)retain) {
     [[[self clients] objectForKey:clientRef] publish:topic
                                                 data:[data dataUsingEncoding:NSUTF8StringEncoding]
                                                  qos:qos

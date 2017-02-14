@@ -18,7 +18,7 @@
 
 - (Mqtt*) initWithEmitter:(RCTEventEmitter *) emitter
                   options:(NSDictionary *) options
-                clientRef:(int) clientRef;
+                clientRef:(NSString *) clientRef;
 - (void) connect;
 - (void) disconnect;
 - (void) subscribe:(NSString *)topic qos:(NSNumber *)qos;

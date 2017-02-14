@@ -14,7 +14,7 @@
 @property (strong, nonatomic) MQTTSessionManager *manager;
 @property (nonatomic, strong) NSDictionary *defaultOptions;
 @property (nonatomic, retain) NSMutableDictionary *options;
-@property int clientRef;
+@property (nonatomic, strong) NSString *clientRef;
 @property (nonatomic, strong) RCTEventEmitter * emitter;
 
 @end
@@ -50,7 +50,7 @@
 
 - (instancetype) initWithEmitter:(RCTEventEmitter *) emitter
                          options:(NSDictionary *) options
-                       clientRef:(int) clientRef {
+                       clientRef:(NSString *) clientRef {
     self = [self init];
     self.emitter = emitter;
     self.clientRef = clientRef;
@@ -102,35 +102,35 @@
         case MQTTSessionManagerStateClosed:
             [self.emitter sendEventWithName:@"mqtt_events"
                                        body:@{@"event": @"closed",
-                                              @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                              @"clientRef": self.clientRef,
                                               @"message": @"closed"
                                               }];
             break;
         case MQTTSessionManagerStateClosing:
             [self.emitter sendEventWithName:@"mqtt_events"
                                        body:@{@"event": @"closing",
-                                              @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                              @"clientRef": self.clientRef,
                                               @"message": @"closing"
                                               }];
             break;
         case MQTTSessionManagerStateConnected:
             [self.emitter sendEventWithName:@"mqtt_events"
                                        body:@{@"event": @"connect",
-                                              @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                              @"clientRef": self.clientRef,
                                               @"message": @"connected"
                                               }];
             break;
         case MQTTSessionManagerStateConnecting:
             [self.emitter sendEventWithName:@"mqtt_events"
                                        body:@{@"event": @"connecting",
-                                              @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                              @"clientRef": self.clientRef,
                                               @"message": @"connecting"
                                               }];
             break;
         case MQTTSessionManagerStateError:
             [self.emitter sendEventWithName:@"mqtt_events"
                                        body:@{@"event": @"error",
-                                              @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                              @"clientRef": self.clientRef,
                                               @"message": @"error"
                                               }];
             break;
@@ -166,7 +166,7 @@
     [self.emitter sendEventWithName:@"mqtt_events"
                                body:@{
                                       @"event": @"message",
-                                      @"clientRef": [NSNumber numberWithInt:[self clientRef]],
+                                      @"clientRef": self.clientRef,
                                       @"message": @{
                                               @"topic": topic,
                                               @"data": dataString,
