@@ -43,16 +43,14 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(createClient:(NSDictionary *) options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-   
-    NSString *clientRef = [[NSProcessInfo processInfo] globallyUniqueString]
-    
-    Mqtt *client = [[Mqtt alloc] initWithEmitter:self
-                                         options:options
-                                       clientRef:clientRef];
-    
+
+    NSString *clientRef = [[NSProcessInfo processInfo] globallyUniqueString];
+
+    Mqtt *client = [[Mqtt alloc] initWithEmitter:self options:options clientRef:clientRef];
+
     [[self clients] setObject:client forKey:clientRef];
-    resolve(clientRef]);
-    
+    resolve(clientRef);
+
 }
 
 RCT_EXPORT_METHOD(removeClient:(nonnull NSString *) clientRef) {
@@ -80,7 +78,7 @@ RCT_EXPORT_METHOD(publish:(nonnull NSString *) clientRef topic:(NSString *)topic
                                                 data:[data dataUsingEncoding:NSUTF8StringEncoding]
                                                  qos:qos
                                               retain:retain];
-    
+
 }
 
 - (void)dealloc
