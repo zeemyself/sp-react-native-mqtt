@@ -22,5 +22,6 @@
 - (void) connect;
 - (void) disconnect;
 - (void) subscribe:(NSString *)topic qos:(NSNumber *)qos;
+- (void) unsubscribe:(NSString *)topic;
 - (void) publish:(NSString *) topic data:(NSData *)data qos:(NSNumber *)qos retain:(BOOL) retain;
 @end

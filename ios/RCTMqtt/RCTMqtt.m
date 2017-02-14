@@ -91,7 +91,10 @@ RCT_EXPORT_METHOD(disconnect:(nonnull NSNumber *) clientRef) {
 
 RCT_EXPORT_METHOD(subscribe:(nonnull NSNumber *) clientRef topic:(NSString *)topic qos:(nonnull NSNumber *)qos) {
     [[[self clients] objectForKey:clientRef] subscribe:topic qos:qos];
-    
+}
+
+RCT_EXPORT_METHOD(unsubscribe:(nonnull NSNumber *) clientRef topic:(NSString *)topic) {
+    [[[self clients] objectForKey:clientRef] unsubscribe:topic qos:qos];
 }
 
 RCT_EXPORT_METHOD(publish:(nonnull NSNumber *) clientRef topic:(NSString *)topic data:(NSString*)data qos:(nonnull NSNumber *)qos retain:(BOOL)retain) {
@@ -104,8 +107,8 @@ RCT_EXPORT_METHOD(publish:(nonnull NSNumber *) clientRef topic:(NSString *)topic
 
 - (void)dealloc
 {
-    
-    
+
+
 }
 
 @end
