@@ -2,8 +2,6 @@
 
 [![npm](https://img.shields.io/npm/dt/react-native-mqtt.svg)]()
 
-# Please use [paho.mqtt.javascript](https://github.com/eclipse/paho.mqtt.javascript) for your application, this repository not use for production
-
 ## Description 
 
 [react-native](https://github.com/facebook/react-native) mqtt client module
@@ -136,7 +134,8 @@ mqtt.createClient({
 
 ## Todo
 
-* [ ] todo
+* [ ] Use WeakReference for timer
+* [ ] Add disconnecting event
 
 
 ## LICENSE
