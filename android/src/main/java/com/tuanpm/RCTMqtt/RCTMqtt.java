@@ -143,7 +143,7 @@ public class RCTMqtt
         }
         if (params.hasKey("willtopic"))
         {
-            defaultOptions.putString("willMsg", params.getString("willMsg"));
+            defaultOptions.putString("willtopic", params.getString("willtopic"));
         }
         if (params.hasKey("willQos"))
         {
@@ -230,7 +230,9 @@ public class RCTMqtt
 
         if (options.getBoolean("will"))
         {
-            // WTF?
+            String topic = options.getString("willtopic");
+            log("[ MQTT ] setWill"+topic);
+            mqttOptions.setWill(topic, options.getString("willMsg").getBytes(), options.getInt("willQos"), options.getBoolean("willRetainFlag"));
         }
 
         memPer = new MemoryPersistence();
