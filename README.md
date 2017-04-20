@@ -1,19 +1,17 @@
-
-
 [![npm](https://img.shields.io/npm/dt/react-native-mqtt.svg)]()
 
-## Description 
+## Description
 
 [react-native](https://github.com/facebook/react-native) mqtt client module
 
 ## MQTT Features (inherit from native MQTT framework)
 * Use [MQTT Framework](https://github.com/ckrey/MQTT-Client-Framework) for IOS, [Paho MQTT Client](https://eclipse.org/paho/clients/android/) for Android
 * Support both IOS and Android
-* SSL/TLS 
-* Native library, support mqtt over tcp 
+* SSL/TLS
+* Native library, support mqtt over tcp
 
 ## Warning
-This library in progress developing, api may change, SSL/TLS non verify 
+This library in progress developing, api may change, SSL/TLS non verify
 
 ## Getting started
 
@@ -76,22 +74,20 @@ dependencies {
 ## Usage
 
 ```javascript
-var mqtt    = require('react-native-mqtt');
+import MQTT from 'react-native-mqtt';
 
 /* create mqtt client */
-mqtt.createClient({
-  uri: 'mqtt://test.mosquitto.org:1883', 
+MQTT.createClient({
+  uri: 'mqtt://test.mosquitto.org:1883',
   clientId: 'your_client_id'
 }).then(function(client) {
 
   client.on('closed', function() {
     console.log('mqtt.event.closed');
-    
   });
-  
+
   client.on('error', function(msg) {
     console.log('mqtt.event.error', msg);
-    
   });
 
   client.on('message', function(msg) {
