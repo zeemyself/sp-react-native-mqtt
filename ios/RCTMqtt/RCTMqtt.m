@@ -27,6 +27,15 @@
 RCT_EXPORT_MODULE();
 
 
++ (id)allocWithZone:(NSZone *)zone {
+    static RCTMqtt *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [super allocWithZone:zone];
+    });
+    return sharedInstance;
+}
+
 - (instancetype)init
 {
     if ((self = [super init])) {
@@ -46,7 +55,7 @@ RCT_EXPORT_METHOD(createClient:(NSDictionary *) options
 
     NSString *clientRef = [[NSProcessInfo processInfo] globallyUniqueString];
 
-    Mqtt *client = [[Mqtt alloc] initWithEmitter:self options:options clientRef:clientRef];
+    Mqtt *client = [[Mqtt allocWithZone: nil] initWithEmitter:self options:options clientRef:clientRef];
 
     [[self clients] setObject:client forKey:clientRef];
     resolve(clientRef);
