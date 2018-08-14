@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rusfearuth/react-native-mqtt.git"
+    "url": "git+https://github.com/notme001/react-native-mqtt.git"
   },
   "keywords": [
     "mqtt",
@@ -23,7 +23,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rusfearuth/react-native-mqtt/issues"
+    "url": "https://github.com/notme001/react-native-mqtt/issues"
   },
-  "homepage": "https://github.com/rusfearuth/react-native-mqtt#readme"
+  "homepage": "https://github.com/notme001/react-native-mqtt#readme"
 }
