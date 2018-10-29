@@ -1,5 +1,5 @@
 {
-  "name": "react-native-mqtt",
+  "name": "angelos3lex/react-native-mqtt",
   "version": "0.2.0",
   "description": "MQTT client for react-native",
   "main": "index.js",
