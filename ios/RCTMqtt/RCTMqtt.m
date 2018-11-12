@@ -36,6 +36,10 @@ RCT_EXPORT_MODULE();
     return sharedInstance;
 }
 
++ (BOOL) requiresMainQueueSetup{
+    return YES;
+}
+
 - (instancetype)init
 {
     if ((self = [super init])) {
@@ -65,6 +69,7 @@ RCT_EXPORT_METHOD(createClient:(NSDictionary *) options
 RCT_EXPORT_METHOD(removeClient:(nonnull NSString *) clientRef) {
     [[self clients] removeObjectForKey:clientRef];
 }
+
 
 RCT_EXPORT_METHOD(connect:(nonnull NSString *) clientRef) {
     [[[self clients] objectForKey:clientRef] connect];
