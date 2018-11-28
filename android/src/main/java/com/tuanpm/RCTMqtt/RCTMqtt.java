@@ -267,7 +267,6 @@ public class RCTMqtt implements MqttCallbackExtended {
                             .toString();
                     params.putString("message", errorDescription);
                     sendEvent(reactContext, "mqtt_events", params);
-                    reconnectIfNeeded(exception);
                 }
             });
         } catch (MqttException e) {
