@@ -46,6 +46,13 @@ MqttClient.prototype.publish = function(topic, payload, qos, retain) {
   Mqtt.publish(this.clientRef, topic, payload, qos, retain);
 }
 
+MqttClient.prototype.reconnect = function() {
+  Mqtt.reconnect(this.clientRef);
+};
+MqttClient.prototype.isConnected = function() {
+  return Mqtt.isConnected(this.clientRef);
+};
+
 const emitter = new NativeEventEmitter(Mqtt)
 
 module.exports = {

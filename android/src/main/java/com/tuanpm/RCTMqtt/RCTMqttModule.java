@@ -96,6 +96,18 @@ public class RCTMqttModule
         clients.remove(clientRef);
     }
 
+    @ReactMethod
+    public void reconnect(@NonNull final String clientRef)
+    {
+        clients.get(clientRef).reconnect();
+    }
+    
+    @ReactMethod
+    public void isConnected(@NonNull final String clientRef, Promise promise)
+    {
+        promise.resolve(clients.get(clientRef).isConnected());
+    }
+    
     private String createClientRef()
     {
         return UUID.randomUUID().toString();

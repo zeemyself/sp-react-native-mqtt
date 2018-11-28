@@ -16,6 +16,7 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -38,10 +39,7 @@ import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 
-
-public class RCTMqtt
-        implements MqttCallback
-{
+public class RCTMqtt implements MqttCallbackExtended {
     private static final String TAG = "RCTMqttModule";
     private final ReactApplicationContext reactContext;
     private final WritableMap defaultOptions;
@@ -51,10 +49,7 @@ public class RCTMqtt
     private MqttConnectOptions mqttOptions;
     private Map<String, Integer> topics = new HashMap<>();
 
-    public RCTMqtt(@NonNull final String ref,
-                   final ReactApplicationContext reactContext,
-                   final ReadableMap options)
-    {
+    public RCTMqtt(@NonNull final String ref, final ReactApplicationContext reactContext, final ReadableMap options) {
         clientRef = ref;
         this.reactContext = reactContext;
         defaultOptions = new WritableNativeMap();
@@ -62,7 +57,7 @@ public class RCTMqtt
         defaultOptions.putInt("port", 1883);
         defaultOptions.putString("protocol", "tcp");
         defaultOptions.putBoolean("tls", false);
-        defaultOptions.putInt("keepalive", 1883);
+        defaultOptions.putInt("keepalive", 60);
         defaultOptions.putString("clientId", "react-native-mqtt");
         defaultOptions.putInt("protocolLevel", 4);
         defaultOptions.putBoolean("clean", true);
@@ -75,227 +70,207 @@ public class RCTMqtt
         defaultOptions.putString("willtopic", "");
         defaultOptions.putInt("willQos", 0);
         defaultOptions.putBoolean("willRetainFlag", false);
+        defaultOptions.putBoolean("automaticReconnect", false);
 
         createClient(options);
     }
 
-    private void createClient(@NonNull final ReadableMap params)
-    {
-        if (params.hasKey("host"))
-        {
+    private void createClient(@NonNull final ReadableMap params) {
+        if (params.hasKey("host")) {
             defaultOptions.putString("host", params.getString("host"));
         }
-        if (params.hasKey("port"))
-        {
+        if (params.hasKey("port")) {
             defaultOptions.putInt("port", params.getInt("port"));
         }
-        if (params.hasKey("protocol"))
-        {
+        if (params.hasKey("protocol")) {
             defaultOptions.putString("protocol", params.getString("protocol"));
         }
-        if (params.hasKey("tls"))
-        {
+        if (params.hasKey("tls")) {
             defaultOptions.putBoolean("tls", params.getBoolean("tls"));
         }
-        if (params.hasKey("keepalive"))
-        {
+        if (params.hasKey("keepalive")) {
             defaultOptions.putInt("keepalive", params.getInt("keepalive"));
         }
-        if (params.hasKey("clientId"))
-        {
+        if (params.hasKey("clientId")) {
             defaultOptions.putString("clientId", params.getString("clientId"));
         }
-        if (params.hasKey("protocolLevel"))
-        {
+        if (params.hasKey("protocolLevel")) {
             defaultOptions.putInt("protocolLevel", params.getInt("protocolLevel"));
         }
-        if (params.hasKey("clean"))
-        {
+        if (params.hasKey("clean")) {
             defaultOptions.putBoolean("clean", params.getBoolean("clean"));
         }
-        if (params.hasKey("auth"))
-        {
+        if (params.hasKey("auth")) {
             defaultOptions.putBoolean("auth", params.getBoolean("auth"));
         }
-        if (params.hasKey("user"))
-        {
+        if (params.hasKey("user")) {
             defaultOptions.putString("user", params.getString("user"));
         }
-        if (params.hasKey("pass"))
-        {
+        if (params.hasKey("pass")) {
             defaultOptions.putString("pass", params.getString("pass"));
         }
-        if (params.hasKey("will"))
-        {
+        if (params.hasKey("will")) {
             defaultOptions.putBoolean("will", params.getBoolean("will"));
         }
-        if (params.hasKey("protocolLevel"))
-        {
+        if (params.hasKey("protocolLevel")) {
             defaultOptions.putInt("protocolLevel", params.getInt("protocolLevel"));
         }
-        if (params.hasKey("will"))
-        {
+        if (params.hasKey("will")) {
             defaultOptions.putBoolean("will", params.getBoolean("will"));
         }
-        if (params.hasKey("willMsg"))
-        {
+        if (params.hasKey("willMsg")) {
             defaultOptions.putString("willMsg", params.getString("willMsg"));
         }
-        if (params.hasKey("willtopic"))
-        {
+        if (params.hasKey("willtopic")) {
             defaultOptions.putString("willtopic", params.getString("willtopic"));
         }
-        if (params.hasKey("willQos"))
-        {
+        if (params.hasKey("willQos")) {
             defaultOptions.putInt("willQos", params.getInt("willQos"));
         }
-        if (params.hasKey("willRetainFlag"))
-        {
+        if (params.hasKey("willRetainFlag")) {
             defaultOptions.putBoolean("willRetainFlag", params.getBoolean("willRetainFlag"));
+        }
+        if (params.hasKey("automaticReconnect")) {
+            defaultOptions.putBoolean("automaticReconnect", params.getBoolean("automaticReconnect"));
         }
 
         ReadableMap options = defaultOptions;
 
-
         // Set this wrapper as the callback handler
-
 
         mqttOptions = new MqttConnectOptions();
 
-        if (options.getInt("protocolLevel") == 3)
-        {
+        if (options.getInt("protocolLevel") == 3) {
             mqttOptions.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1);
         }
 
         mqttOptions.setKeepAliveInterval(options.getInt("keepalive"));
+        mqttOptions.setMaxInflight(1000);
+        mqttOptions.setConnectionTimeout(10);
 
         StringBuilder uri = new StringBuilder("tcp://");
-        if (options.getBoolean("tls"))
-        {
+        if (options.getBoolean("tls")) {
             uri = new StringBuilder("ssl://");
-            try
-            {
+            try {
                 /*
-        			http://stackoverflow.com/questions/3761737/https-get-ssl-with-android-and-self-signed-server-certificate
-        
-        			WARNING: for anybody else arriving at this answer, this is a dirty,
-        			horrible hack and you must not use it for anything that matters.
-        			SSL/TLS without authentication is worse than no encryption at all -
-        			reading and modifying your "encrypted" data is trivial for an attacker and you wouldn't even know it was happening
-        		 */
+                 * http://stackoverflow.com/questions/3761737/https-get-ssl-with-android-and-
+                 * self-signed-server-certificate
+                 * 
+                 * WARNING: for anybody else arriving at this answer, this is a dirty, horrible
+                 * hack and you must not use it for anything that matters. SSL/TLS without
+                 * authentication is worse than no encryption at all - reading and modifying
+                 * your "encrypted" data is trivial for an attacker and you wouldn't even know
+                 * it was happening
+                 */
                 SSLContext sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, new X509TrustManager[]{new X509TrustManager()
-                {
-                    public void checkClientTrusted(X509Certificate[] chain,
-                                                   String authType) throws
-                            CertificateException
-                    {
+                sslContext.init(null, new X509TrustManager[] { new X509TrustManager() {
+                    public void checkClientTrusted(X509Certificate[] chain, String authType)
+                            throws CertificateException {
                     }
 
-                    public void checkServerTrusted(X509Certificate[] chain,
-                                                   String authType) throws
-                            CertificateException
-                    {
+                    public void checkServerTrusted(X509Certificate[] chain, String authType)
+                            throws CertificateException {
                     }
 
-                    public X509Certificate[] getAcceptedIssuers()
-                    {
+                    public X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
                     }
-                }}, new SecureRandom());
+                } }, new SecureRandom());
 
                 mqttOptions.setSocketFactory(sslContext.getSocketFactory());
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
         uri.append(options.getString("host")).append(":").append(options.getInt("port"));
 
-        if (options.getBoolean("auth"))
-        {
+        if (options.getBoolean("auth")) {
             String user = options.getString("user");
             String pass = options.getString("pass");
-            if (user.length() > 0)
-            {
+            if (user.length() > 0) {
                 mqttOptions.setUserName(user);
             }
-            if (pass.length() > 0)
-            {
+            if (pass.length() > 0) {
                 mqttOptions.setPassword(pass.toCharArray());
             }
         }
 
-        if (options.getBoolean("will"))
-        {
+        if (options.getBoolean("will")) {
             String topic = options.getString("willtopic");
-            log("[ MQTT ] setWill"+topic);
-            mqttOptions.setWill(topic, options.getString("willMsg").getBytes(), options.getInt("willQos"), options.getBoolean("willRetainFlag"));
+            log("[ MQTT ] setWill" + topic);
+            mqttOptions.setWill(topic, options.getString("willMsg").getBytes(), options.getInt("willQos"),
+                    options.getBoolean("willRetainFlag"));
         }
-
+        mqttOptions.setAutomaticReconnect(options.getBoolean("automaticReconnect"));
         memPer = new MemoryPersistence();
 
-        try
-        {
+        try {
             client = new MqttAsyncClient(uri.toString(), options.getString("clientId"), memPer);
-        }
-        catch (MqttException e)
-        {
+        } catch (MqttException e) {
             e.printStackTrace();
         }
     }
 
-    public void setCallback()
-    {
+    public void setCallback() {
         client.setCallback(this);
     }
 
+    public void reconnect() {
+        try {
+            log("came here");
+            WritableMap params = Arguments.createMap();
+            params.putString("event", "reconnecting");
+            params.putString("message", "try to reconnect");
+            sendEvent(reactContext, "mqtt_events", params);
+            client.reconnect();
+        } catch (MqttException e) {
+            WritableMap params = Arguments.createMap();
+            params.putString("event", "error");
+            params.putString("message", e.getMessage());
+            sendEvent(reactContext, "mqtt_events", params);
+        }
+    }
 
-    public void connect()
-    {
-        try
-        {
+    public boolean isConnected() {
+        return client.isConnected();
+    }
+
+    public void connect() {
+        try {
             WritableMap params = Arguments.createMap();
             params.putString("event", "connecting");
             params.putString("message", "try to connect");
             sendEvent(reactContext, "mqtt_events", params);
 
             // Connect using a non-blocking connect
-            client.connect(mqttOptions, reactContext, new IMqttActionListener()
-            {
-                public void onSuccess(IMqttToken asyncActionToken)
-                {
-                    WritableMap params = Arguments.createMap();
-                    params.putString("event", "connect");
-                    params.putString("message", "connected");
-                    sendEvent(reactContext, "mqtt_events", params);
-                    log("Connected");
+            client.connect(mqttOptions, reactContext, new IMqttActionListener() {
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    // not needed since connectionComplete callback is now implemented
+                    // WritableMap params = Arguments.createMap();
+                    // params.putString("event", "connect");
+                    // params.putString("message", "connected");
+                    // sendEvent(reactContext, "mqtt_events", params);
+                    // log("Connected");
 
                     Iterator<String> iterator = topics.keySet().iterator();
-                    while(iterator.hasNext())
-                    {
+                    while (iterator.hasNext()) {
                         final String topic = iterator.next();
                         subscribe(topic, topics.get(topic));
                     }
                 }
 
-                public void onFailure(IMqttToken asyncActionToken,
-                                      Throwable exception)
-                {
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     WritableMap params = Arguments.createMap();
                     params.putString("event", "error");
-                    final String errorDescription = new StringBuilder("connection failure ")
-                            .append(exception).toString();
+                    final String errorDescription = new StringBuilder("connection failure ").append(exception)
+                            .toString();
                     params.putString("message", errorDescription);
                     sendEvent(reactContext, "mqtt_events", params);
                     reconnectIfNeeded(exception);
                 }
             });
-        }
-        catch (MqttException e)
-        {
+        } catch (MqttException e) {
             WritableMap params = Arguments.createMap();
             params.putString("event", "error");
             params.putString("message", "Can't create connection");
@@ -303,12 +278,9 @@ public class RCTMqtt
         }
     }
 
-    public void disconnect()
-    {
-        IMqttActionListener discListener = new IMqttActionListener()
-        {
-            public void onSuccess(IMqttToken asyncActionToken)
-            {
+    public void disconnect() {
+        IMqttActionListener discListener = new IMqttActionListener() {
+            public void onSuccess(IMqttToken asyncActionToken) {
                 log("Disconnect Completed");
                 WritableMap params = Arguments.createMap();
                 params.putString("event", "closed");
@@ -316,81 +288,59 @@ public class RCTMqtt
                 sendEvent(reactContext, "mqtt_events", params);
             }
 
-            public void onFailure(IMqttToken asyncActionToken,
-                                  Throwable exception)
-            {
+            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                 log(new StringBuilder("Disconnect failed").append(exception).toString());
             }
         };
 
-        try
-        {
+        try {
             client.disconnect(reactContext, discListener);
-        }
-        catch (MqttException e)
-        {
+        } catch (MqttException e) {
             log("Disconnect failed ...");
         }
     }
 
-    public void subscribe(@NonNull final String topic,
-                          final int qos)
-    {
-        try
-        {
+    public void subscribe(@NonNull final String topic, final int qos) {
+        try {
             topics.put(topic, qos);
             IMqttToken subToken = client.subscribe(topic, qos);
-            subToken.setActionCallback(new IMqttActionListener()
-            {
+            subToken.setActionCallback(new IMqttActionListener() {
                 @Override
-                public void onSuccess(IMqttToken asyncActionToken)
-                {
+                public void onSuccess(IMqttToken asyncActionToken) {
                     // The message was published
                     log("Subscribe success");
                 }
 
                 @Override
-                public void onFailure(IMqttToken asyncActionToken,
-                                      Throwable exception)
-                {
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     // The subscription could not be performed, maybe the user was not
                     // authorized to subscribe on the specified topic e.g. using wildcards
                     log("Subscribe failed");
                 }
             });
-        }
-        catch (MqttException e)
-        {
+        } catch (MqttException e) {
             log("Cann't subscribe");
             e.printStackTrace();
         }
     }
 
-    public void unsubscribe(@NonNull final String topic)
-    {
-        try
-        {
+    public void unsubscribe(@NonNull final String topic) {
+        try {
             if (topics.containsKey(topic)) {
                 topics.remove(topic);
             }
-            client.unsubscribe(topic).setActionCallback(new IMqttActionListener()
-            {
+            client.unsubscribe(topic).setActionCallback(new IMqttActionListener() {
                 @Override
-                public void onSuccess(IMqttToken asyncActionToken)
-                {
+                public void onSuccess(IMqttToken asyncActionToken) {
                     log(new StringBuilder("Subscribed on ").append(topic).toString());
                 }
 
                 @Override
-                public void onFailure(IMqttToken asyncActionToken,
-                                      Throwable exception)
-                {
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     log(new StringBuilder("Failed to subscribe on ").append(topic).toString());
                 }
             });
-        }
-        catch (MqttException e)
-        {
+        } catch (MqttException e) {
             log(new StringBuilder("Can't unsubscribe").append(" ").append(topic).toString());
             e.printStackTrace();
         }
@@ -402,52 +352,52 @@ public class RCTMqtt
      * @param qos
      * @param retain
      */
-    public void publish(@NonNull final String topic,
-                        @NonNull final String payload,
-                        final int qos,
-                        final boolean retain)
-    {
-        try
-        {
+    public void publish(@NonNull final String topic, @NonNull final String payload, final int qos,
+            final boolean retain) {
+        try {
             byte[] encodedPayload = payload.getBytes("UTF-8");
             MqttMessage message = new MqttMessage(encodedPayload);
             message.setQos(qos);
             message.setRetained(retain);
             client.publish(topic, message);
-        }
-        catch (UnsupportedEncodingException | MqttException e)
-        {
+        } catch (UnsupportedEncodingException | MqttException e) {
             e.printStackTrace();
         }
     }
 
     /****************************************************************/
-  	/* Methods to implement the MqttCallback interface              */
+    /* Methods to implement the MqttCallback interface */
     /****************************************************************/
 
     /**
      * @see MqttCallback#connectionLost(Throwable)
      */
-    public void connectionLost(Throwable cause)
-    {
+    public void connectionLost(Throwable cause) {
         // Called when the connection to the server has been lost.
         // An application may choose to implement reconnection
         // logic at this point. This sample simply exits.
-        log(new StringBuilder("Connection to lost! ").append(cause).toString());
+        log(new StringBuilder("Connection lost! ").append(cause).toString());
         WritableMap params = Arguments.createMap();
         params.putString("event", "error");
-        final String errorDescription = new StringBuilder("Connection to lost! ")
-                .append(cause).toString();
+        final String errorDescription = new StringBuilder("ConnectionLost! ").append(cause).toString();
         params.putString("message", errorDescription);
-        sendEvent(reactContext, "mqtt_events", params);
-        reconnectIfNeeded(cause);
+
+        if (!(cause instanceof MqttException)) {
+            final String notMqttExceptionError = new StringBuilder("Not MqttException ").append(cause).toString();
+            log(notMqttExceptionError);
+            return;
+        }
+
+        final MqttException mqttError = (MqttException) cause;
+        if (isInsideWantedCodes(mqttError)) {
+            sendEvent(reactContext, "mqtt_events", params);
+        }
     }
 
     /**
      * @see MqttCallback#deliveryComplete(IMqttDeliveryToken)
      */
-    public void deliveryComplete(IMqttDeliveryToken token)
-    {
+    public void deliveryComplete(IMqttDeliveryToken token) {
         // Called when a message has been delivered to the
         // server. The token passed in here is the same one
         // that was returned from the original call to publish.
@@ -463,19 +413,21 @@ public class RCTMqtt
         // note that token.getTopics() returns an array so we convert to a string
         // before printing it on the console
         log("Delivery complete callback: Publish Completed ");
+        WritableMap params = Arguments.createMap();
+        params.putString("event", "msgSent");
+        params.putString("message", "OK");
+        sendEvent(reactContext, "mqtt_events", params);
     }
 
     /**
      * @see MqttCallback#messageArrived(String, MqttMessage)
      */
-    public void messageArrived(@NonNull final String topic,
-                               @NonNull final MqttMessage message) throws
-            MqttException
-    {
+    public void messageArrived(@NonNull final String topic, @NonNull final MqttMessage message) throws MqttException {
         // Called when a message arrives from the server that matches any
         // subscription made by the client
 
-        log(new StringBuilder("  Topic:\t").append(topic).append("  Message:\t").append(new String(message.getPayload())).append("  QoS:\t").append(message.getQos()).toString());
+        log(new StringBuilder("  Topic:\t").append(topic).append("  Message:\t")
+                .append(new String(message.getPayload())).append("  QoS:\t").append(message.getQos()).toString());
 
         WritableMap data = Arguments.createMap();
         data.putString("topic", topic);
@@ -489,69 +441,40 @@ public class RCTMqtt
         sendEvent(reactContext, "mqtt_events", params);
     }
 
-    private void sendEvent(final ReactContext reactContext,
-                           final String eventName,
-                           @Nullable WritableMap params)
-    {
+    private void sendEvent(final ReactContext reactContext, final String eventName, @Nullable WritableMap params) {
         params.putString("clientRef", this.clientRef);
         reactContext.getJSModule(RCTNativeAppEventEmitter.class).emit(eventName, params);
     }
 
-    private boolean needToReconnect(@NonNull final MqttException exception)
-    {
+    private boolean isInsideWantedCodes(@NonNull final MqttException exception) {
+
         int reasonCode = exception.getReasonCode();
-        return reasonCode == MqttException.REASON_CODE_SERVER_CONNECT_ERROR ||
-                reasonCode == MqttException.REASON_CODE_CLIENT_EXCEPTION ||
-                reasonCode == MqttException.REASON_CODE_CONNECTION_LOST;
+        return reasonCode == MqttException.REASON_CODE_SERVER_CONNECT_ERROR
+                || reasonCode == MqttException.REASON_CODE_CLIENT_EXCEPTION
+                || reasonCode == MqttException.REASON_CODE_CONNECTION_LOST
+                || reasonCode == MqttException.REASON_CODE_CLIENT_TIMEOUT
+                || reasonCode == MqttException.REASON_CODE_WRITE_TIMEOUT;
     }
 
-    private void reconnectIfNeeded(@NonNull final Throwable cause)
-    {
-        if (!(cause instanceof MqttException))
-        {
-            final String notMqttExceptionError = new StringBuilder("Not MqttException ")
-                            .append(cause).toString();
-            log(notMqttExceptionError);
-            return;
-        }
-
-        final MqttException mqttError = (MqttException) cause;
-
-        if (!needToReconnect(mqttError))
-        {
-            final String noNeedToReconnect = new StringBuilder("No need to reconnect ")
-                            .append(mqttError.getReasonCode()).toString();
-            log(noNeedToReconnect);
-            return;
-        }
-
-        final String timerName = new StringBuilder("reconnect-")
-                .append(UUID.randomUUID().toString())
-                .toString();
-
-        final Timer timer = new Timer(timerName);
-        timer.schedule(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                log("[ MQTT ] reconnect");
-                connect();
-                timer.cancel();
-                timer.purge();
-            }
-        }, TimeUnit.SECONDS.toMillis(5));
+    @Override
+    public void connectComplete(boolean reconnect, String serverURI) {
+        Log.d(TAG, String.format("connectComplete. reconnect:%1$b", reconnect));
+        WritableMap data = Arguments.createMap();
+        data.putBoolean("reconnect", reconnect);
+        WritableMap params = Arguments.createMap();
+        params.putString("event", "connect");
+        params.putMap("message", data);
+        sendEvent(reactContext, "mqtt_events", params);
     }
 
     /**
-     * Utility method to handle logging. If 'quietMode' is set, this method does nothing
+     * Utility method to handle logging. If 'quietMode' is set, this method does
+     * nothing
      *
      * @param message the message to log
      */
-    private void log(@NonNull final String message)
-    {
-        if (!BuildConfig.DEBUG)
-        {
+    private void log(@NonNull final String message) {
+        if (!BuildConfig.DEBUG) {
             return;
         }
         final String tag = new StringBuilder(TAG).append(" ").append(clientRef).toString();
