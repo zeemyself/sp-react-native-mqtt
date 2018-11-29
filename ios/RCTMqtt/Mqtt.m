@@ -140,9 +140,19 @@
     }
 }
 
+- (void)messageDelivered:(UInt16)msgID {
+    NSLog(@"messageDelivered");
+    NSString *codeString = [NSString stringWithFormat:@"%d",msgID];
+    [self.emitter sendEventWithName:@"mqtt_events"
+                               body:@{@"event": @"msgSent",
+                                      @"clientRef": self.clientRef,
+                                      @"message": codeString
+                                      }];
+}
+
 - (void) disconnect {
     [self.manager disconnect];
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+    // [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
 }
 
 - (void) subscribe:(NSString *)topic qos:(NSNumber *)qos {
