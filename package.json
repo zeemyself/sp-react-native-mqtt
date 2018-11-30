@@ -1,6 +1,6 @@
 {
-  "name": "react-native-mqtt-angelos3lex",
-  "version": "0.4.3",
+  "name": "@hawkingnetwork/react-native-mqtt",
+  "version": "0.4.4",
   "description": "MQTT client for react-native",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/notme001/react-native-mqtt.git"
+    "url": "git+https://github.com/hawkingnetwork/react-native-mqtt.git"
   },
   "keywords": [
     "mqtt",
@@ -17,12 +17,25 @@
   ],
   "author": "Tuan PM <tuanpm@live.com> (http://tuanpm.net)",
   "contributors": [
-    { "name" : "Yury Korolev", "email" : "yury.korolev@gmail.com", "url" : "http://anjlab.com" },
-    { "name" : "Alexander Ustinov", "email" : "rusfearuth@gmail.com", "url" : "http://github.com/rusfearuth" }
+    {
+      "name": "Yury Korolev",
+      "email": "yury.korolev@gmail.com",
+      "url": "http://anjlab.com"
+    },
+    {
+      "name": "Alexander Ustinov",
+      "email": "rusfearuth@gmail.com",
+      "url": "http://github.com/rusfearuth"
+    },
+    {
+      "name": "Duong Le",
+      "email": "navi.ocean@outlook.com",
+      "url": "https://github.com/naviocean"
+    }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/notme001/react-native-mqtt/issues"
+    "url": "https://github.com/hawkingnetwork/react-native-mqtt/issues"
   },
-  "homepage": "https://github.com/notme001/react-native-mqtt#readme"
+  "homepage": "https://github.com/hawkingnetwork/react-native-mqtt#readme"
 }
