@@ -341,7 +341,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../../react-native/React/**",
-					"$(SRCROOT)/../../../react-native-mqtt-angelos3lex/ios/RCTMqtt/**",
+					"$(SRCROOT)/../../../@hawkingnetwork/react-native-mqtt/ios/RCTMqtt/**",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -359,7 +359,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../../react-native/React/**",
-					"$(SRCROOT)/../../../react-native-mqtt-angelos3lex/ios/RCTMqtt/**",
+					"$(SRCROOT)/../../../@hawkingnetwork/react-native-mqtt/ios/RCTMqtt/**",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
