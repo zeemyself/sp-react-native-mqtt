@@ -18,27 +18,39 @@
 - (instancetype)init {
     self = [super init];
     self.state = MQTTDecoderStateInitializing;
-    self.runLoop = [NSRunLoop currentRunLoop];
-    self.runLoopMode = NSRunLoopCommonModes;
     self.streams = [NSMutableArray arrayWithCapacity:5];
+    self.queue = dispatch_get_main_queue();
     return self;
 }
 
 - (void)dealloc {
-    [self close];
+    // https://github.com/novastone-media/MQTT-Client-Framework/issues/325
+    // It is probably not the best solution to use deprecated API
+    // but it is bug that happens quite often so it is important to fix it
+    // and if we find better solution we can change it later
+    
+    // We need to make sure that we are closing streams on their queue
+    // Otherwise, we end up with race condition where delegate is deallocated
+    // but still used by run loop event
+    if (self.queue != dispatch_get_current_queue()) {
+        dispatch_sync(self.queue, ^{
+            [self close];
+        });
+    }
 }
 
 - (void)decodeMessage:(NSData *)data {
     NSInputStream *stream = [NSInputStream inputStreamWithData:data];
+    CFReadStreamRef readStream = (__bridge CFReadStreamRef)stream;
+    CFReadStreamSetDispatchQueue(readStream, self.queue);
     [self openStream:stream];
 }
 
-- (void)openStream:(NSInputStream*)stream {
+- (void)openStream:(NSInputStream *)stream {
     [self.streams addObject:stream];
-    [stream setDelegate:self];
+    stream.delegate = self;
     DDLogVerbose(@"[MQTTDecoder] #streams=%lu", (unsigned long)self.streams.count);
     if (self.streams.count == 1) {
-        [stream scheduleInRunLoop:self.runLoop forMode:self.runLoopMode];
         [stream open];
     }
 }
@@ -51,14 +63,13 @@
     if (self.streams) {
         for (NSInputStream *stream in self.streams) {
             [stream close];
-            [stream removeFromRunLoop:self.runLoop forMode:self.runLoopMode];
             [stream setDelegate:nil];
         }
         [self.streams removeAllObjects];
     }
 }
 
-- (void)stream:(NSStream*)sender handleEvent:(NSStreamEvent)eventCode {
+- (void)stream:(NSStream *)sender handleEvent:(NSStreamEvent)eventCode {
     NSInputStream *stream = (NSInputStream *)sender;
     
     if (eventCode & NSStreamEventOpenCompleted) {
@@ -130,6 +141,9 @@
                 [self.delegate decoder:self didReceiveMessage:self.dataBuffer];
                 self.dataBuffer = nil;
                 self.state = MQTTDecoderStateDecodingHeader;
+            } else {
+                DDLogError(@"[MQTTDecoder] oops received (%lu)=%@...", (unsigned long)self.dataBuffer.length,
+                             [self.dataBuffer subdataWithRange:NSMakeRange(0, MIN(256, self.dataBuffer.length))]);
             }
         }
     }
@@ -146,8 +160,7 @@
             [stream close];
             [self.streams removeObject:stream];
             if (self.streams.count) {
-                NSInputStream *stream = [self.streams objectAtIndex:0];
-                [stream scheduleInRunLoop:self.runLoop forMode:self.runLoopMode];
+                NSInputStream *stream = (self.streams)[0];
                 [stream open];
             }
         }
@@ -157,12 +170,11 @@
         DDLogVerbose(@"[MQTTDecoder] NSStreamEventErrorOccurred");
         
         self.state = MQTTDecoderStateConnectionError;
-        NSError *error = [stream streamError];
+        NSError *error = stream.streamError;
         if (self.streams) {
             [self.streams removeObject:stream];
             if (self.streams.count) {
-                NSInputStream *stream = [self.streams objectAtIndex:0];
-                [stream scheduleInRunLoop:self.runLoop forMode:self.runLoopMode];
+                NSInputStream *stream = (self.streams)[0];
                 [stream open];
             }
         }

@@ -58,7 +58,7 @@
     for (NSString *key in options.keyEnumerator) { // Replace default options
         [self.options setValue:options[key] forKey:key];
     }
-    self.manager = [[MQTTSessionManager alloc] initWithPersistence:NO maxWindowSize:MQTT_MAX_WINDOW_SIZE maxMessages:MQTT_MAX_MESSAGES maxSize:MQTT_MAX_SIZE];
+    self.manager = [[MQTTSessionManager alloc] init];
     self.manager.delegate = self;
     
     return self;
@@ -151,8 +151,10 @@
 }
 
 - (void) disconnect {
-    [self.manager disconnect];
     // [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+    [self.manager disconnect];
+    
 }
 
 - (void) subscribe:(NSString *)topic qos:(NSNumber *)qos {

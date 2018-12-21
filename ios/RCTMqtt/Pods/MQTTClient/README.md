@@ -1,11 +1,18 @@
-MQTT-Client-Framework 
-=====================
+# MQTT-Client-Framework 
 
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+| |Build Status|
+|---|:---:|
+|**iOS**  |[![Build Status](https://travis-ci.org/novastone-media/MQTT-Client-Framework.svg?branch=master)](https://travis-ci.org/novastone-media/MQTT-Client-Framework)|
+|**macOS**||
+|**tvOS** ||
 
-an Objective-C native MQTT Framework http://mqtt.org
+**Welcome to MQTT-Client-Framework**
 
-### Tested with
+MQTT-Client-Framework is Objective-C native MQTT Framework http://mqtt.org
+
+You can read [introduction](http://www.hivemq.com/blog/mqtt-client-library-encyclopedia-mqtt-client-framework) to learn more about framework.
+
+MQTT-Client-Framework is tested with a long list of brokers:
 
 * mosquitto
 * paho
@@ -21,8 +28,11 @@ an Objective-C native MQTT Framework http://mqtt.org
 * CloudMQTT
 * aws
 * hbmqtt (MQTTv311 only, limitations)
+* [aedes](https://github.com/mcollina/aedes) 
 
-### Howto
+## Installation
+
+### As a CocoaPod
 
 Use the CocoaPod MQTTClient! 
 
@@ -53,20 +63,29 @@ pod 'MQTTClient/WebsocketL'
 ```
 instead.
 
+### As a dynamic library
+
 Or use the dynamic library created in the MQTTFramework target.
+
+### As source
 
 Or include the source from here.
 
-[Documentation](MQTTClient/dist/documentation/html/index.html)
+### With Carthage
 
-### Usage
+[Carthage](https://github.com/Carthage/Carthage)
+```
+github "novastone-media/MQTT-Client-Framework"
+```
+
+## Usage
 
 Create a new client and connect to a broker:
 
 ```objective-c
 #import "MQTTClient.h"
 
-\@interface MyDelegate : ... <MQTTSessionDelegate>
+@interface MyDelegate : ... <MQTTSessionDelegate>
 ...
 
         MQTTCFSocketTransport *transport = [[MQTTCFSocketTransport alloc] init];
@@ -116,13 +135,3 @@ Publish a message to a topic:
 	                qos:MQTTQosLevelAtLeastOnce]; // this is part of the asynchronous API
 ```
 
-#### docs
-
-Documentation generated with doxygen http://doxygen.org
-
-#### Comparison MQTT Clients for iOS (incomplete)
-
-|Wrapper|---|----|MQTTKit  |Marquette|Moscapsule|Musqueteer|MQTT-Client|MqttSDK|CocoaMQTT|
-|-------|---|----|---------|---------|----------|----------|-----------|-------|---------|
-|       |   |    |Obj-C    |Obj-C    |Swift     |Obj-C     |Obj-C      |Obj-C  |Swift    |
-|Library|IBM|Paho|Mosquitto|Mosquitto|Mosquitto |Mosquitto |native     |native |native   |
