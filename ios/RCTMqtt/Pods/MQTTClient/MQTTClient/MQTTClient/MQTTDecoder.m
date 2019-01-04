@@ -9,8 +9,12 @@
 
 #import "MQTTLog.h"
 
-@interface MQTTDecoder()
+@interface MQTTDecoder() {
+    void *QueueIdentityKey;
+}
+
 @property (nonatomic) NSMutableArray<NSInputStream *> *streams;
+
 @end
 
 @implementation MQTTDecoder
@@ -24,19 +28,24 @@
 }
 
 - (void)dealloc {
-    // https://github.com/novastone-media/MQTT-Client-Framework/issues/325
-    // It is probably not the best solution to use deprecated API
-    // but it is bug that happens quite often so it is important to fix it
-    // and if we find better solution we can change it later
+    [self close];
+}
+
+- (void)setQueue:(dispatch_queue_t)queue {
+    _queue = queue;
     
-    // We need to make sure that we are closing streams on their queue
-    // Otherwise, we end up with race condition where delegate is deallocated
-    // but still used by run loop event
-    if (self.queue != dispatch_get_current_queue()) {
-        dispatch_sync(self.queue, ^{
-            [self close];
-        });
-    }
+    // We're going to use dispatch_queue_set_specific() to "mark" our queue.
+    // The dispatch_queue_set_specific() and dispatch_get_specific() functions take a "void *key" parameter.
+    // Later we can use dispatch_get_specific() to determine if we're executing on our queue.
+    // From the documentation:
+    //
+    // > Keys are only compared as pointers and are never dereferenced.
+    // > Thus, you can use a pointer to a static variable for a specific subsystem or
+    // > any other value that allows you to identify the value uniquely.
+    //
+    // So we're just going to use the memory address of an ivar.
+    
+    dispatch_queue_set_specific(_queue, &QueueIdentityKey, (__bridge void *)_queue, NULL);
 }
 
 - (void)decodeMessage:(NSData *)data {
@@ -59,7 +68,7 @@
     self.state = MQTTDecoderStateDecodingHeader;
 }
 
-- (void)close {
+- (void)internalClose {
     if (self.streams) {
         for (NSInputStream *stream in self.streams) {
             [stream close];
@@ -69,7 +78,28 @@
     }
 }
 
+- (void)close {
+    // https://github.com/novastone-media/MQTT-Client-Framework/issues/325
+    // We need to make sure that we are closing streams on their queue
+    // Otherwise, we end up with race condition where delegate is deallocated
+    // but still used by run loop event
+    if (self.queue != dispatch_get_specific(&QueueIdentityKey)) {
+        dispatch_sync(self.queue, ^{
+            [self internalClose];
+        });
+    } else {
+        [self internalClose];
+    }
+}
+
 - (void)stream:(NSStream *)sender handleEvent:(NSStreamEvent)eventCode {
+    // We contact our delegate, MQTTSession at some point in this method
+    // This call can cause MQTTSession to dealloc and thus, MQTTDecoder to dealloc
+    // So we end up with invalid object in the middle of the method
+    // To prevent this we retain self for duration of this method call
+    MQTTDecoder *strongDecoder = self;
+    (void)strongDecoder;
+    
     NSInputStream *stream = (NSInputStream *)sender;
     
     if (eventCode & NSStreamEventOpenCompleted) {
@@ -142,7 +172,7 @@
                 self.dataBuffer = nil;
                 self.state = MQTTDecoderStateDecodingHeader;
             } else {
-                DDLogError(@"[MQTTDecoder] oops received (%lu)=%@...", (unsigned long)self.dataBuffer.length,
+                DDLogWarn(@"[MQTTDecoder] oops received (%lu)=%@...", (unsigned long)self.dataBuffer.length,
                              [self.dataBuffer subdataWithRange:NSMakeRange(0, MIN(256, self.dataBuffer.length))]);
             }
         }

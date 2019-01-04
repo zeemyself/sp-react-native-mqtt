@@ -4,6 +4,7 @@
 //
 //  Created by Tuan PM on 2/13/16.
 //  Copyright © 2016 Tuan PM. All rights reserved.
+//  Updated by NaviOcean on 01/04/18
 //
 
 #import "Mqtt.h"
@@ -45,6 +46,8 @@
         
     }
     
+    
+    
     return self;
 }
 
@@ -58,13 +61,15 @@
     for (NSString *key in options.keyEnumerator) { // Replace default options
         [self.options setValue:options[key] forKey:key];
     }
-    self.manager = [[MQTTSessionManager alloc] init];
-    self.manager.delegate = self;
+
+   
+    
     
     return self;
 }
 
 - (void) connect {
+    
     MQTTSSLSecurityPolicy *securityPolicy = nil;
     if(self.options[@"tls"]) {
         securityPolicy = [MQTTSSLSecurityPolicy policyWithPinningMode:MQTTSSLPinningModeNone];
@@ -75,7 +80,11 @@
     if(self.options[@"willMsg"] != [NSNull null]) {
         willMsg = [self.options[@"willMsg"] dataUsingEncoding:NSUTF8StringEncoding];
     }
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+    if (!self.manager) {
+        dispatch_queue_t queue1 = dispatch_queue_create("com.hawking.app.anchor.mqtt", NULL);
+        self.manager = [[MQTTSessionManager alloc] initWithPersistence:NO maxWindowSize:MQTT_MAX_WINDOW_SIZE maxMessages:MQTT_MAX_MESSAGES maxSize:MQTT_MAX_SIZE maxConnectionRetryInterval:60.0 connectInForeground:NO streamSSLLevel:nil queue: queue1];
+        self.manager.delegate = self;
+        
         [self.manager connectTo:[self.options valueForKey:@"host"]
                            port:[self.options[@"port"] intValue]
                             tls:[self.options[@"tls"] boolValue]
@@ -92,8 +101,15 @@
                    withClientId:[self.options valueForKey:@"clientId"]
                  securityPolicy:securityPolicy
                    certificates:nil
-         ];
-    }];
+                  protocolLevel:MQTTProtocolVersion311
+                 connectHandler:^(NSError *error) {
+         }];
+
+    } else {
+        [self.manager connectToLast:^(NSError *error) {
+        }];
+    }
+   
 }
 
 - (void)sessionManager:(MQTTSessionManager *)sessonManager didChangeState:(MQTTSessionManagerState)newState {
@@ -153,7 +169,8 @@
 - (void) disconnect {
     // [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
-    [self.manager disconnect];
+    [self.manager disconnectWithDisconnectHandler:^(NSError *error) {
+    }];
     
 }
 

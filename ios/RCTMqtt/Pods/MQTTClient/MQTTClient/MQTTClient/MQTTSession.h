@@ -350,6 +350,15 @@ typedef void (^MQTTPublishHandler)(NSError *error);
  */
 @property (nonatomic, readonly) BOOL sessionPresent;
 
+/** streamSSLLevel an NSString containing the security level for read and write streams
+ * For list of possible values see:
+ * https://developer.apple.com/documentation/corefoundation/cfstream/cfstream_socket_security_level_constants
+ * Please also note that kCFStreamSocketSecurityLevelTLSv1_2 is not in a list
+ * and cannot be used as constant, but you can use it as a string value
+ * defaults to kCFStreamSocketSecurityLevelNegotiatedSSL
+ */
+@property (strong, nonatomic) NSString *streamSSLLevel;
+
 /** host an NSString containing the hostName or IP address of the Server
  */
 @property (readonly) NSString *host;
@@ -566,7 +575,8 @@ typedef void (^MQTTPublishHandler)(NSError *error);
  
  */
 
-- (UInt16)subscribeToTopic:(NSString *)topic atLevel:(MQTTQosLevel)qosLevel;
+- (UInt16)subscribeToTopic:(NSString *)topic
+                   atLevel:(MQTTQosLevel)qosLevel;
 /** subscribes to a topic at a specific QoS level
  
  @param topic the Topic Filter to subscribe to.
@@ -601,7 +611,9 @@ typedef void (^MQTTPublishHandler)(NSError *error);
  
  */
 
-- (UInt16)subscribeToTopic:(NSString *)topic atLevel:(MQTTQosLevel)qosLevel subscribeHandler:(MQTTSubscribeHandler)subscribeHandler;
+- (UInt16)subscribeToTopic:(NSString *)topic
+                   atLevel:(MQTTQosLevel)qosLevel
+          subscribeHandler:(MQTTSubscribeHandler)subscribeHandler;
 
 /** subscribes a number of topics
  
@@ -667,7 +679,8 @@ typedef void (^MQTTPublishHandler)(NSError *error);
  */
 
 
-- (UInt16)subscribeToTopics:(NSDictionary<NSString *, NSNumber *> *)topics subscribeHandler:(MQTTSubscribeHandler)subscribeHandler;
+- (UInt16)subscribeToTopics:(NSDictionary<NSString *, NSNumber *> *)topics
+           subscribeHandler:(MQTTSubscribeHandler)subscribeHandler;
 
 /** unsubscribes from a topic
  
@@ -705,7 +718,8 @@ typedef void (^MQTTPublishHandler)(NSError *error);
  */
 
 
-- (UInt16)unsubscribeTopic:(NSString *)topic unsubscribeHandler:(MQTTUnsubscribeHandler)unsubscribeHandler;
+- (UInt16)unsubscribeTopic:(NSString *)topic
+        unsubscribeHandler:(MQTTUnsubscribeHandler)unsubscribeHandler;
 
 /** unsubscribes from a number of topics
  
@@ -747,7 +761,8 @@ typedef void (^MQTTPublishHandler)(NSError *error);
  @note returns immediately.
  
  */
-- (UInt16)unsubscribeTopics:(NSArray<NSString *> *)topics unsubscribeHandler:(MQTTUnsubscribeHandler)unsubscribeHandler;
+- (UInt16)unsubscribeTopics:(NSArray<NSString *> *)topics
+         unsubscribeHandler:(MQTTUnsubscribeHandler)unsubscribeHandler;
 
 /** publishes data on a given topic at a specified QoS level and retain flag
  
@@ -775,7 +790,10 @@ typedef void (^MQTTPublishHandler)(NSError *error);
  
  */
 
-- (UInt16)publishData:(NSData *)data onTopic:(NSString *)topic retain:(BOOL)retainFlag qos:(MQTTQosLevel)qos;
+- (UInt16)publishData:(NSData *)data
+              onTopic:(NSString *)topic
+               retain:(BOOL)retainFlag
+                  qos:(MQTTQosLevel)qos;
 
 /** publishes data on a given topic at a specified QoS level and retain flag
  
@@ -818,7 +836,11 @@ typedef void (^MQTTPublishHandler)(NSError *error);
  
  */
 
-- (UInt16)publishData:(NSData *)data onTopic:(NSString *)topic retain:(BOOL)retainFlag qos:(MQTTQosLevel)qos publishHandler:(MQTTPublishHandler)publishHandler;
+- (UInt16)publishData:(NSData *)data
+              onTopic:(NSString *)topic
+               retain:(BOOL)retainFlag
+                  qos:(MQTTQosLevel)qos
+       publishHandler:(MQTTPublishHandler)publishHandler;
 
 /** closes an MQTTSession gracefully
  
@@ -860,9 +882,5 @@ typedef void (^MQTTPublishHandler)(NSError *error);
                reasonString:(NSString *)reasonString
                userProperty:(NSDictionary <NSString *, NSString *> *)userProperty
           disconnectHandler:(MQTTDisconnectHandler)disconnectHandler;
-
-/** closes an MQTTSession gracefully
-  */
-- (void)close;
 
 @end

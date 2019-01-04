@@ -89,6 +89,7 @@ NSString * const MQTTSessionErrorDomain = @"MQTT";
     self.protocolLevel = MQTTProtocolVersion311;
     self.queue = dispatch_get_main_queue();
     self.status = MQTTSessionStatusCreated;
+    self.streamSSLLevel = (NSString *)kCFStreamSocketSecurityLevelNegotiatedSSL;
     return self;
 }
 
@@ -111,6 +112,11 @@ NSString * const MQTTSessionErrorDomain = @"MQTT";
     }
 
     _clientId = clientId;
+}
+
+- (void)setStreamSSLLevel:(NSString *)streamSSLLevel {
+    _streamSSLLevel = streamSSLLevel;
+    self.transport.streamSSLLevel = self.streamSSLLevel;
 }
 
 - (UInt16)subscribeToTopic:(NSString *)topic
@@ -470,11 +476,6 @@ NSString * const MQTTSessionErrorDomain = @"MQTT";
     }
     [self tell];
     return msgId;
-}
-
-
-- (void)close {
-    [self closeWithDisconnectHandler:nil];
 }
 
 - (void)closeWithDisconnectHandler:(MQTTDisconnectHandler)disconnectHandler {
@@ -1262,7 +1263,7 @@ NSString * const MQTTSessionErrorDomain = @"MQTT";
         self.connectionHandler(eventCode);
     }
 
-    if(eventCode == MQTTSessionEventConnectionClosedByBroker && self.connectHandler) {
+    if (eventCode == MQTTSessionEventConnectionClosedByBroker && self.connectHandler) {
         error = [NSError errorWithDomain:MQTTSessionErrorDomain
                                     code:MQTTSessionErrorConnectionRefused
                                 userInfo:@{NSLocalizedDescriptionKey : @"Server has closed connection without connack."}];
@@ -1315,85 +1316,23 @@ NSString * const MQTTSessionErrorDomain = @"MQTT";
     }
 }
 
-/*
- * Threaded block callbacks
- */
 - (void)onConnect:(MQTTConnectHandler)connectHandler error:(NSError *)error {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:connectHandler forKey:@"Block"];
-    if (error) {
-        dict[@"Error"] = error;
-    }
-    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(onConnectExecute:) object:dict];
-    [thread start];
-}
-
-- (void)onConnectExecute:(NSDictionary *)dict {
-    MQTTConnectHandler connectHandler = dict[@"Block"];
-    NSError *error = dict[@"Error"];
     connectHandler(error);
 }
 
 - (void)onDisconnect:(MQTTDisconnectHandler)disconnectHandler error:(NSError *)error {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:disconnectHandler forKey:@"Block"];
-    if (error) {
-        dict[@"Error"] = error;
-    }
-    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(onDisconnectExecute:) object:dict];
-    [thread start];
-}
-
-- (void)onDisconnectExecute:(NSDictionary *)dict {
-    MQTTDisconnectHandler disconnectHandler = dict[@"Block"];
-    NSError *error = dict[@"Error"];
     disconnectHandler(error);
 }
 
-- (void)onSubscribe:(MQTTSubscribeHandler)subscribeHandler error:(NSError *)error gQoss:(NSArray *)gqoss{
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:subscribeHandler forKey:@"Block"];
-    if (error) {
-        dict[@"Error"] = error;
-    }
-    if (gqoss) {
-        dict[@"GQoss"] = gqoss;
-    }
-    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(onSubscribeExecute:) object:dict];
-    [thread start];
-}
-
-- (void)onSubscribeExecute:(NSDictionary *)dict {
-    MQTTSubscribeHandler subscribeHandler = dict[@"Block"];
-    NSError *error = dict[@"Error"];
-    NSArray *gqoss = dict[@"GQoss"];
+- (void)onSubscribe:(MQTTSubscribeHandler)subscribeHandler error:(NSError *)error gQoss:(NSArray *)gqoss {
     subscribeHandler(error, gqoss);
 }
 
 - (void)onUnsubscribe:(MQTTUnsubscribeHandler)unsubscribeHandler error:(NSError *)error {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:unsubscribeHandler forKey:@"Block"];
-    if (error) {
-        dict[@"Error"] = error;
-    }
-    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(onUnsubscribeExecute:) object:dict];
-    [thread start];
-}
-
-- (void)onUnsubscribeExecute:(NSDictionary *)dict {
-    MQTTUnsubscribeHandler unsubscribeHandler = dict[@"Block"];
-    NSError *error = dict[@"Error"];
     unsubscribeHandler(error);
 }
 
 - (void)onPublish:(MQTTPublishHandler)publishHandler error:(NSError *)error {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:publishHandler forKey:@"Block"];
-    if (error) {
-        dict[@"Error"] = error;
-    }
-    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(onPublishExecute:) object:dict];
-    [thread start];
-}
-
-- (void)onPublishExecute:(NSDictionary *)dict {
-    MQTTPublishHandler publishHandler = dict[@"Block"];
-    NSError *error = dict[@"Error"];
     publishHandler(error);
 }
 
