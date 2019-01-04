@@ -1,6 +1,6 @@
 {
   "name": "@hawkingnetwork/react-native-mqtt",
-  "version": "0.4.13",
+  "version": "0.4.14",
   "description": "MQTT client for react-native",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "reactnative",
     "iot"
   ],
-  "author": "Tuan PM <tuanpm@live.com> (http://tuanpm.net)",
+  "author": "NaviOcean <navi.ocean@outlook.com> (https://githubs.com/naviocean)",
   "contributors": [
     {
       "name": "Yury Korolev",
@@ -28,9 +28,9 @@
       "url": "http://github.com/rusfearuth"
     },
     {
-      "name": "Duong Le",
-      "email": "navi.ocean@outlook.com",
-      "url": "https://github.com/naviocean"
+      "name": "Tuan PM",
+      "email": "tuanpm@live.com",
+      "url": "http://tuanpm.net"
     }
   ],
   "license": "MIT",
