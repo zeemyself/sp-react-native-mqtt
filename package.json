@@ -32,7 +32,7 @@
       "email": "tuanpm@live.com",
       "url": "http://tuanpm.net"
     }
-  ],
+  ],  
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/SudoPlz/react-native-mqtt/issues"
