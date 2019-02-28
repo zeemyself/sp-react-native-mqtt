@@ -7,36 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A841BE22E98C6742FF425184 /* libPods-RCTMqtt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B55C262163796F269BAA3909 /* libPods-RCTMqtt.a */; };
 		D20012C61E4FA06500CE2854 /* Mqtt.m in Sources */ = {isa = PBXBuildFile; fileRef = D20012C51E4FA06500CE2854 /* Mqtt.m */; };
-		D22753771E4FC1C1009AB3F8 /* libSocketRocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D22753761E4FC1C1009AB3F8 /* libSocketRocket.a */; };
-		D2F42A421E4FBD7C00343251 /* libMQTTClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D218D27B1E4F7EE2000D8F51 /* libMQTTClient.a */; };
 		FF7A9D4E1C64788B006743BA /* RCTMqtt.m in Sources */ = {isa = PBXBuildFile; fileRef = FF7A9D4C1C64788B006743BA /* RCTMqtt.m */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		D218D27A1E4F7EE2000D8F51 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D218D2741E4F7EE1000D8F51 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 318E89590A5684E53EC2C67636F92021;
-			remoteInfo = MQTTClient;
-		};
-		D218D27C1E4F7EE2000D8F51 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D218D2741E4F7EE1000D8F51 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B970A7F185BF945A74ADFEE2441A7F5B;
-			remoteInfo = "Pods-RCTMqtt";
-		};
-		D22753751E4FC1C1009AB3F8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D218D2741E4F7EE1000D8F51 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8BA2FB05B17409076B33A55A70DFB4CC;
-			remoteInfo = SocketRocket;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		FF7A9D3E1C64785B006743BA /* CopyFiles */ = {
@@ -51,12 +24,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4249D0004A04076D92547DD0 /* Pods-RCTMqtt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RCTMqtt.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RCTMqtt/Pods-RCTMqtt.debug.xcconfig"; sourceTree = "<group>"; };
-		65867FF64EF615F5B1FF81B0 /* Pods-RCTMqtt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RCTMqtt.release.xcconfig"; path = "Pods/Target Support Files/Pods-RCTMqtt/Pods-RCTMqtt.release.xcconfig"; sourceTree = "<group>"; };
-		B55C262163796F269BAA3909 /* libPods-RCTMqtt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RCTMqtt.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D20012C41E4FA06500CE2854 /* Mqtt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mqtt.h; sourceTree = "<group>"; };
 		D20012C51E4FA06500CE2854 /* Mqtt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Mqtt.m; sourceTree = "<group>"; };
-		D218D2741E4F7EE1000D8F51 /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = Pods/Pods.xcodeproj; sourceTree = "<group>"; };
 		FF7A9D401C64785B006743BA /* libRCTMqtt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTMqtt.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF7A9D4C1C64788B006743BA /* RCTMqtt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCTMqtt.m; sourceTree = "<group>"; };
 		FF7A9D4D1C64788B006743BA /* RCTMqtt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCTMqtt.h; sourceTree = "<group>"; };
@@ -67,42 +36,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D22753771E4FC1C1009AB3F8 /* libSocketRocket.a in Frameworks */,
-				D2F42A421E4FBD7C00343251 /* libMQTTClient.a in Frameworks */,
-				A841BE22E98C6742FF425184 /* libPods-RCTMqtt.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1EA4FFB6633E7E226B726A7B /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				B55C262163796F269BAA3909 /* libPods-RCTMqtt.a */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		38EFACF7AB6D9C9C3D24BDCB /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				4249D0004A04076D92547DD0 /* Pods-RCTMqtt.debug.xcconfig */,
-				65867FF64EF615F5B1FF81B0 /* Pods-RCTMqtt.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
-		D218D2751E4F7EE1000D8F51 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				D218D27B1E4F7EE2000D8F51 /* libMQTTClient.a */,
-				D218D27D1E4F7EE2000D8F51 /* libPods-RCTMqtt.a */,
-				D22753761E4FC1C1009AB3F8 /* libSocketRocket.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		FF7A9D371C64785B006743BA = {
 			isa = PBXGroup;
 			children = (
@@ -111,9 +50,6 @@
 				FF7A9D4C1C64788B006743BA /* RCTMqtt.m */,
 				FF7A9D4D1C64788B006743BA /* RCTMqtt.h */,
 				FF7A9D411C64785B006743BA /* Products */,
-				38EFACF7AB6D9C9C3D24BDCB /* Pods */,
-				1EA4FFB6633E7E226B726A7B /* Frameworks */,
-				D218D2741E4F7EE1000D8F51 /* Pods.xcodeproj */,
 			);
 			sourceTree = "<group>";
 		};
@@ -170,42 +106,12 @@
 			mainGroup = FF7A9D371C64785B006743BA;
 			productRefGroup = FF7A9D411C64785B006743BA /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = D218D2751E4F7EE1000D8F51 /* Products */;
-					ProjectRef = D218D2741E4F7EE1000D8F51 /* Pods.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				FF7A9D3F1C64785B006743BA /* RCTMqtt */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		D218D27B1E4F7EE2000D8F51 /* libMQTTClient.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libMQTTClient.a;
-			remoteRef = D218D27A1E4F7EE2000D8F51 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		D218D27D1E4F7EE2000D8F51 /* libPods-RCTMqtt.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libPods-RCTMqtt.a";
-			remoteRef = D218D27C1E4F7EE2000D8F51 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		D22753761E4FC1C1009AB3F8 /* libSocketRocket.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSocketRocket.a;
-			remoteRef = D22753751E4FC1C1009AB3F8 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		8A2A2943DEA045B900795060 /* [CP] Check Pods Manifest.lock */ = {
@@ -323,7 +229,6 @@
 		};
 		FF7A9D4A1C64785B006743BA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4249D0004A04076D92547DD0 /* Pods-RCTMqtt.debug.xcconfig */;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -341,7 +246,6 @@
 		};
 		FF7A9D4B1C64785B006743BA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 65867FF64EF615F5B1FF81B0 /* Pods-RCTMqtt.release.xcconfig */;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
