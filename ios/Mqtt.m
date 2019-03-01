@@ -82,6 +82,7 @@
     }
     if (!self.manager) {
         dispatch_queue_t queue = dispatch_queue_create("com.hawking.app.anchor.mqtt", NULL);
+        
         self.manager = [[MQTTSessionManager alloc] initWithPersistence:NO maxWindowSize:MQTT_MAX_WINDOW_SIZE maxMessages:MQTT_MAX_MESSAGES maxSize:MQTT_MAX_SIZE maxConnectionRetryInterval:60.0 connectInForeground:NO streamSSLLevel:nil queue: queue];
         self.manager.delegate = self;
         MQTTCFSocketTransport *transport = [[MQTTCFSocketTransport alloc] init];
@@ -147,13 +148,16 @@
                                               @"message": @"connecting"
                                               }];
             break;
-        case MQTTSessionManagerStateError:
+        case MQTTSessionManagerStateError: {
+            NSError *lastError = self.manager.lastErrorCode;
+            NSString *errorMsg = [NSString stringWithFormat:@"error: %@", [lastError localizedDescription]];
             [self.emitter sendEventWithName:@"mqtt_events"
                                        body:@{@"event": @"error",
                                               @"clientRef": self.clientRef,
-                                              @"message": @"error"
+                                              @"message": errorMsg
                                               }];
             break;
+        }
         case MQTTSessionManagerStateStarting:
         default:
             break;
