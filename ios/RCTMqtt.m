@@ -22,19 +22,12 @@
 
 
 @implementation RCTMqtt
-
+{
+    bool hasListeners;
+}
 
 RCT_EXPORT_MODULE();
 
-
-+ (id)allocWithZone:(NSZone *)zone {
-    static RCTMqtt *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [super allocWithZone:zone];
-    });
-    return sharedInstance;
-}
 
 + (BOOL) requiresMainQueueSetup{
     return NO;
@@ -49,8 +42,27 @@ RCT_EXPORT_MODULE();
     
 }
 
+
+- (void)sendEventWithName:(NSString *)name body:(id)body {
+    if (hasListeners && self.bridge) { // Only send events if anyone is listening
+        [super sendEventWithName:name body:body];
+    }
+}
+
 - (NSArray<NSString *> *)supportedEvents {
     return @[ @"mqtt_events" ];
+}
+
+// Will be called when this module's first listener is added.
+-(void)startObserving {
+    hasListeners = YES;
+    // Set up any upstream listeners or background tasks as necessary
+}
+
+// Will be called when this module's last listener is removed, or on dealloc.
+-(void)stopObserving {
+    hasListeners = NO;
+    // Remove upstream listeners, stop unnecessary background tasks
 }
 
 RCT_EXPORT_METHOD(createClient:(NSDictionary *) options
@@ -100,5 +112,3 @@ RCT_EXPORT_METHOD(publish:(nonnull NSString *) clientRef topic:(NSString *)topic
 }
 
 @end
-
-

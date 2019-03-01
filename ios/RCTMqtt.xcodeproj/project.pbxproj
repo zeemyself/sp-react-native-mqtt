@@ -47,8 +47,8 @@
 			children = (
 				D20012C41E4FA06500CE2854 /* Mqtt.h */,
 				D20012C51E4FA06500CE2854 /* Mqtt.m */,
-				FF7A9D4C1C64788B006743BA /* RCTMqtt.m */,
 				FF7A9D4D1C64788B006743BA /* RCTMqtt.h */,
+				FF7A9D4C1C64788B006743BA /* RCTMqtt.m */,
 				FF7A9D411C64785B006743BA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -211,7 +211,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../../../../react-native/React/**",
-					"$(SRCROOT)/../../../../@hawkingnetwork/react-native-mqtt/ios/RCTMqtt/**",
+					"$(SRCROOT)/../../../node_modules/sp-react-native-mqtt/ios",
+					"$(SRCROOT)/../node_modules/sp-react-native-mqtt/ios",
+					"$(SRCROOT)/../../../../sp-react-native-mqtt/ios/**",
+					"$(SRCROOT)/../../../ios/Pods/MQTTClient/**",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -228,7 +231,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../../../../react-native/React/**",
-					"$(SRCROOT)/../../../../@hawkingnetwork/react-native-mqtt/ios/RCTMqtt/**",
+					"$(SRCROOT)/../../../node_modules/sp-react-native-mqtt/ios",
+					"$(SRCROOT)/../node_modules/sp-react-native-mqtt/ios",
+					"$(SRCROOT)/../../../../sp-react-native-mqtt/ios/**",
+					"$(SRCROOT)/../../../ios/Pods/MQTTClient/**",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
