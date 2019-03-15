@@ -112,7 +112,12 @@ RCT_EXPORT_METHOD(publish:(nonnull NSString *) clientRef topic:(NSString *)topic
                                                 data:[data dataUsingEncoding:NSUTF8StringEncoding]
                                                  qos:qos
                                               retain:retain];
+    
+}
 
+- (void)invalidate
+{
+    [self disconnectAll];
 }
 
 - (void)dealloc

@@ -16,8 +16,7 @@ import com.facebook.react.bridge.ReadableMap;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class RCTMqttModule
-        extends ReactContextBaseJavaModule
+public class RCTMqttModule extends ReactContextBaseJavaModule
 {
 
     private static final String TAG = "RCTMqttModule";
@@ -131,4 +130,10 @@ public class RCTMqttModule
         }
         Log.d(TAG, message);
     }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+        disconnectAll();
+    }
+
 }
