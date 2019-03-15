@@ -115,6 +115,10 @@ module.exports = {
     }
 
     Mqtt.removeClient(client.clientRef);
-  }
+  },
+
+  disconnectAll: function () {
+    Mqtt.disconnectAll();
+  },
 
 };
