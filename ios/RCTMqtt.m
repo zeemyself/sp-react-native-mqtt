@@ -91,7 +91,7 @@ RCT_EXPORT_METHOD(disconnect:(nonnull NSString *) clientRef) {
     [[[self clients] objectForKey:clientRef] disconnect];
 }
 
-RCT_EXPORT_METHOD(disconnectAll:() clientRef) {
+RCT_EXPORT_METHOD(disconnectAll) {
     if (self.clients.count > 0) {
         for(NSString* aClientRef in self.clients) {
             [[[self clients] objectForKey:aClientRef] disconnect];
