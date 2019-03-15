@@ -62,6 +62,16 @@ public class RCTMqttModule
     }
 
     @ReactMethod
+    public void disconnectAll()
+    {
+        if (clients != null && clients.size() > 0) {
+            for (RCTMqtt aClient : clients.values()) {
+                aClient.disconnect();
+            }
+        }
+    }
+
+    @ReactMethod
     public void subscribe(@NonNull final String clientRef,
                           @NonNull final String topic,
                           final int qos)
