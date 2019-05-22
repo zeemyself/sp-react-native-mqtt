@@ -1,6 +1,6 @@
 {
   "name": "sp-react-native-mqtt",
-  "version": "0.4.23",
+  "version": "0.4.24",
   "description": "MQTT client for react-native",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,11 @@
     "reactnative",
     "iot"
   ],
-  "author": "NaviOcean <navi.ocean@outlook.com> (https://githubs.com/naviocean)",
+  "author": {
+    "name": "Ioannis Kokkinidis",
+    "email": "sudoplz@gmail.com",
+    "url": "https://www.linkedin.com/in/sudoplz"
+  },
   "contributors": [
     {
       "name": "Yury Korolev",
