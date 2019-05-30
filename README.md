@@ -1,16 +1,18 @@
-[![npm](https://img.shields.io/npm/dt/react-native-mqtt.svg)]()
+[![npm version](https://badge.fury.io/js/sp-react-native-mqtt.svg)](https://badge.fury.io/js/sp-react-native-mqtt)
 
 ## Description
 
 [react-native](https://github.com/facebook/react-native) mqtt client module
 
 ## MQTT Features (inherit from native MQTT framework)
+
 * Use [MQTT Framework](https://github.com/ckrey/MQTT-Client-Framework) for IOS, [Paho MQTT Client](https://eclipse.org/paho/clients/android/) for Android
 * Support both IOS and Android
 * SSL/TLS
 * Native library, support mqtt over tcp
 
 ## Warning
+
 This library in progress developing, api may change, SSL/TLS non verify
 
 ## Getting started
@@ -18,26 +20,35 @@ This library in progress developing, api may change, SSL/TLS non verify
 ### Manual install
 
 #### JS
+
 ```bash
-npm install rusfearuth/react-native-mqtt --save
-```
-or
-```bash
-yarn add rusfearuth/react-native-mqtt
+npm install sp-react-native-mqtt --save
 ```
 
+or
+
+```bash
+yarn add sp-react-native-mqtt
+```
+
+### Linking
+
+```sh
+react-native link sp-react-native-mqtt
+```
 
 #### iOS
--  In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
-- Go to `node_modules` ➜ `react-native-mqtt` and add `RCTMqtt.xcodeproj`
-- In XCode, in the project navigator, select your project. Add `libRCTmqtt.a` and `libicucore.tbd` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-- Click `RCTMqtt.xcodeproj` in the project navigator and go the `Build Settings` tab. Make sure 'All' is toggled on (instead of 'Basic'). In the `Search Paths` section, look for `Header Search Paths` and make sure it contains both `$(SRCROOT)/../../react-native/React` - mark  as `recursive`.
-Add `pod 'MQTTClient'` to your podfile and `pod install`
-- Run your project (`Cmd+R`)
 
+* In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
+* Go to `node_modules` ➜ `react-native-mqtt` and add `RCTMqtt.xcodeproj`
+* In XCode, in the project navigator, select your project. Add `libRCTmqtt.a` and `libicucore.tbd` to your project's `Build Phases` ➜ `Link Binary With Libraries`
+* Click `RCTMqtt.xcodeproj` in the project navigator and go the `Build Settings` tab. Make sure 'All' is toggled on (instead of 'Basic'). In the `Search Paths` section, look for `Header Search Paths` and make sure it contains both `$(SRCROOT)/../../react-native/React` - mark  as `recursive`.
+* Add `pod 'MQTTClient'` to your podfile and `pod install`
+* Run your project (`Cmd+R`)
 
 #### Android
--   Modify the ReactInstanceManager.builder() calls chain in `android/app/main/java/.../MainActivity.java` to include:
+
+* Modify the ReactInstanceManager.builder() calls chain in `android/app/main/java/.../MainActivity.java` to include:
 
 ```java
 import com.tuanpm.RCTMqtt.*; // import
@@ -48,29 +59,27 @@ import com.tuanpm.RCTMqtt.*; // import
 new RCTMqttPackage()           // for newest version of react-native
 ```
 
--  Append the following lines to `android/settings.gradle` before `include ':app'`:
+* Append the following lines to `android/settings.gradle` before `include ':app'`:
 
-```
+```gradle
 include ':react-native-mqtt'
 project(':react-native-mqtt').projectDir = new File(rootProject.projectDir,  '../node_modules/react-native-mqtt/android')
 
 ```
 
+* Insert the following lines inside the dependencies block in `android/app/build.gradle`, don't missing `apply plugin:'java'` on top:
 
-- Insert the following lines inside the dependencies block in `android/app/build.gradle`, don't missing `apply plugin:'java'` on top:
-
-```
+```gradle
 compile project(':react-native-mqtt')
 ```
 
 Notes:
 
-```
+```gradle
 dependencies {
   compile project(':react-native-mqtt')
 }
 ```
-
 
 ## Usage
 
@@ -109,42 +118,42 @@ MQTT.createClient({
 ```
 
 ## API
+
 * `mqtt.createClient(options)`  create new client instance with `options`, async operation
-  - `uri`: `protocol://host:port`, protocol is [mqtt | mqtts]
-  - `host`: ipaddress or host name (override by uri if set)
-  - `port`: port number (override by uri if set)
-  - `tls`: true/false (override by uri if set to mqtts or wss)
-  - `user`: string username
-  - `pass`: string password
-  - `auth`: true/false - override = true if `user` or `pass` exist
-  - `clientId`: string client id
-  - `keepalive`
+  * `uri`: `protocol://host:port`, protocol is [mqtt | mqtts]
+  * `host`: ipaddress or host name (override by uri if set)
+  * `port`: port number (override by uri if set)
+  * `tls`: true/false (override by uri if set to mqtts or wss)
+  * `user`: string username
+  * `pass`: string password
+  * `auth`: true/false - override = true if `user` or `pass` exist
+  * `clientId`: string client id
+  * `keepalive`
 
 * `client`
-  - `on(event, callback)`: add event listener for
-    + event: `connect` - client connected
-    + event: `closed` - client disconnected
-    + event: `error` - error
-    + event: `message` - message object
-  - `connect`: begin connection
-  - `disconnect`: disconnect
-  - `subscribe(topic, qos)`
-  - `publish(topic, payload, qos, retain)`
+  * `on(event, callback)`: add event listener for
+    * event: `connect` - client connected
+    * event: `closed` - client disconnected
+    * event: `error` - error
+    * event: `message` - message object
+  * `connect`: begin connection
+  * `disconnect`: disconnect
+  * `subscribe(topic, qos)`
+  * `publish(topic, payload, qos, retain)`
 
 * `message`
-  - `retain`: *boolean* `false`
-  - `qos`: *number* `2`
-  - `data`: *string* `"test message"`
-  - `topic`: *string* `"/data"`
+  * `retain`: *boolean* `false`
+  * `qos`: *number* `2`
+  * `data`: *string* `"test message"`
+  * `topic`: *string* `"/data"`
 
 ## Todo
 
 * [ ] Use WeakReference for timer
 * [ ] Add disconnecting event
 
-
 ## LICENSE
 
-```
+```text
 INHERIT FROM MQTT LIBRARY (progress)
 ```
