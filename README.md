@@ -80,7 +80,7 @@ compile project(':sp-react-native-mqtt')
 ## Usage
 
 ```javascript
-import MQTT from 'react-native-mqtt';
+import MQTT from 'sp-react-native-mqtt';
 
 /* create mqtt client */
 MQTT.createClient({
