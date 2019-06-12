@@ -42,9 +42,9 @@ Add `pod 'MQTTClient'` to your podfile and `pod install`
 <summary>Alternatively you can manually link the library on iOS (click to expand)</summary>
 
 In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
-- Go to `node_modules` ➜ `sp-react-native-mqtt` and add `RCTMqtt.xcodeproj`
-- In XCode, in the project navigator, select your project. Add `libRCTmqtt.a` and `libicucore.tbd` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-- Click `RCTMqtt.xcodeproj` in the project navigator and go the `Build Settings` tab. Make sure 'All' is toggled on (instead of 'Basic'). In the `Search Paths` section, look for `Header Search Paths` and make sure it contains both `$(SRCROOT)/../../react-native/React` - mark  as `recursive`.
+* Go to `node_modules` ➜ `sp-react-native-mqtt` and add `RCTMqtt.xcodeproj`
+* In XCode, in the project navigator, select your project. Add `libRCTmqtt.a` and `libicucore.tbd` to your project's `Build Phases` ➜ `Link Binary With Libraries`
+* Click `RCTMqtt.xcodeproj` in the project navigator and go the `Build Settings` tab. Make sure 'All' is toggled on (instead of 'Basic'). In the `Search Paths` section, look for `Header Search Paths` and make sure it contains both `$(SRCROOT)/../../react-native/React` - mark  as `recursive`.
 
 </details>
 
@@ -52,7 +52,7 @@ In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [y
 
 ##### Android
 
--   Modify the ReactInstanceManager.builder() calls chain in `android/app/main/java/.../MainActivity.java` to include:
+*   Modify the ReactInstanceManager.builder() calls chain in `android/app/main/java/.../MainActivity.java` to include:
 
 ```java
 import com.tuanpm.RCTMqtt.*; // import
@@ -60,7 +60,7 @@ import com.tuanpm.RCTMqtt.*; // import
 new RCTMqttPackage()           // as a child of the getPackages() returned array
 ```
 
--  Append the following lines to `android/settings.gradle` before `include ':app'`:
+* Append the following lines to `android/settings.gradle` before `include ':app'`:
 
 ```
 include ':sp-react-native-mqtt'
@@ -114,42 +114,42 @@ MQTT.createClient({
 ```
 
 ## API
+
 * `mqtt.createClient(options)`  create new client instance with `options`, async operation
-  - `uri`: `protocol://host:port`, protocol is [mqtt | mqtts]
-  - `host`: ipaddress or host name (override by uri if set)
-  - `port`: port number (override by uri if set)
-  - `tls`: true/false (override by uri if set to mqtts or wss)
-  - `user`: string username
-  - `pass`: string password
-  - `auth`: true/false - override = true if `user` or `pass` exist
-  - `clientId`: string client id
-  - `keepalive`
+  * `uri`: `protocol://host:port`, protocol is [mqtt | mqtts]
+  * `host`: ipaddress or host name (override by uri if set)
+  * `port`: port number (override by uri if set)
+  * `tls`: true/false (override by uri if set to mqtts or wss)
+  * `user`: string username
+  * `pass`: string password
+  * `auth`: true/false - override = true if `user` or `pass` exist
+  * `clientId`: string client id
+  * `keepalive`
 
 * `client`
-  - `on(event, callback)`: add event listener for
-    + event: `connect` - client connected
-    + event: `closed` - client disconnected
-    + event: `error` - error
-    + event: `message` - message object
-  - `connect`: begin connection
-  - `disconnect`: disconnect
-  - `subscribe(topic, qos)`
-  - `publish(topic, payload, qos, retain)`
+  * `on(event, callback)`: add event listener for
+    * event: `connect` - client connected
+    * event: `closed` - client disconnected
+    * event: `error` - error
+    * event: `message` - message object
+  * `connect`: begin connection
+  * `disconnect`: disconnect
+  * `subscribe(topic, qos)`
+  * `publish(topic, payload, qos, retain)`
 
 * `message`
-  - `retain`: *boolean* `false`
-  - `qos`: *number* `2`
-  - `data`: *string* `"test message"`
-  - `topic`: *string* `"/data"`
+  * `retain`: *boolean* `false`
+  * `qos`: *number* `2`
+  * `data`: *string* `"test message"`
+  * `topic`: *string* `"/data"`
 
 ## Todo
 
 * [ ] Use WeakReference for timer
 * [ ] Add disconnecting event
 
-
 ## LICENSE
 
-```
+```text
 INHERIT FROM MQTT LIBRARY (progress)
 ```
