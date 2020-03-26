@@ -26,7 +26,7 @@ or
 yarn add sp-react-native-mqtt
 ```
 
-#### Step 2:
+#### Step 2: (Skip this step if you are using RN 0.60 or above as the module will be auto-linked)
 
 ```bash
 react-native link sp-react-native-mqtt
