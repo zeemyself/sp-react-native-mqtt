@@ -122,7 +122,7 @@ MQTT.createClient({
   * `tls`: true/false (override by uri if set to mqtts or wss)
   * `user`: string username
   * `pass`: string password
-  * `auth`: true/false - override = true if `user` or `pass` exist
+  * `auth`: true/false - override = true Set to true if `user` or `pass` exist
   * `clientId`: string client id
   * `keepalive`
 
