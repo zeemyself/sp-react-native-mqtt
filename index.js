@@ -65,7 +65,7 @@ module.exports = {
   },
   createClient: async function(options) {
     if(options.uri) {
-      var pattern = /^((mqtt[s]?|ws[s]?)?:(\/\/)([0-9a-zA-Z_\.]*):?(\d+))$/;
+      var pattern = /^((mqtt[s]?|ws[s]?)?:(\/\/)([a-z0-9A-Z_\.\-]*):?(\d+))$/;
       var matches = options.uri.match(pattern);
       if (!matches) {
         throw new Error(`Uri passed to createClient ${options.uri} doesn't match a known protocol (mqtt:// or ws://).`);
