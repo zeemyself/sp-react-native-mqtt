@@ -52,13 +52,15 @@ In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [y
 
 ##### Android
 
-*   Modify the ReactInstanceManager.builder() calls chain in `android/app/main/java/.../MainActivity.java` to include:
+* Add the following line in `getPackages()` method inside the `ReactNativeHost` object in `android/app/src/main/java/.../MainApplication.java`:
 
 ```java
-import com.tuanpm.RCTMqtt.*; // import
 
-new RCTMqttPackage()           // as a child of the getPackages() returned array
+packages.add(new RCTMqttPackage());           // as a child of the getPackages() returned array
+
 ```
+
+Don't forget to include `import com.tuanpm.RCTMqtt.*;` with the other imports at the top.
 
 * Append the following lines to `android/settings.gradle` before `include ':app'`:
 
@@ -69,10 +71,10 @@ project(':sp-react-native-mqtt').projectDir = new File(rootProject.projectDir,  
 ```
 
 
-- Insert the following lines inside the dependencies block in `android/app/build.gradle`, don't miss `apply plugin:'java'` on top:
+- Insert the following lines inside the dependencies block in `android/app/build.gradle`:
 
 ```
-compile project(':sp-react-native-mqtt')
+implementation ':sp-react-native-mqtt'
 ```
 
 
