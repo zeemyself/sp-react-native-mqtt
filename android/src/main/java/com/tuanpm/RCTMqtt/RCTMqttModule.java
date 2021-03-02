@@ -116,7 +116,19 @@ public class RCTMqttModule extends ReactContextBaseJavaModule
     {
         promise.resolve(clients.get(clientRef).isConnected());
     }
-    
+
+    @ReactMethod
+    public void getTopics(@NonNull final String clientRef, Promise promise)
+    {
+	promise.resolve(clients.get(clientRef).getTopics());
+    }
+
+    @ReactMethod
+    public void isSubbed(@NonNull final String clientRef, String topic, Promise promise)
+    {
+	promise.resolve(clients.get(clientRef).isSubbed(topic));
+    }
+
     private String createClientRef()
     {
         return UUID.randomUUID().toString();
