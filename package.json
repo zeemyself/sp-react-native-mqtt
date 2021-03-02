@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SudoPlz/react-native-mqtt.git"
+    "url": "git+https://github.com/spit4520/react-native-mqtt.git"
   },
   "keywords": [
     "mqtt",
@@ -16,9 +16,9 @@
     "iot"
   ],
   "author": {
-    "name": "Ioannis Kokkinidis",
-    "email": "sudoplz@gmail.com",
-    "url": "https://www.linkedin.com/in/sudoplz"
+    "name": "Scott Joseph Spitler II",
+    "email": "scott@kuhmute.com",
+    "url": "https://www.linkedin.com/in/sspitler"
   },
   "contributors": [
     {
@@ -40,7 +40,12 @@
       "name": "taoqf",
       "email": "tao_qiufeng@126.com",
       "url": "http://github.com/taoqf"
-    }
+    },
+		{
+			"name": "Scott Spitler",
+			"email": "scott@kuhmute.com",
+			"url": "https://kuhmute.dev"
+		}
   ],
   "license": "MIT",
   "bugs": {

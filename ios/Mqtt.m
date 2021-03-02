@@ -5,6 +5,8 @@
 //  Created by Tuan PM on 2/13/16.
 //  Copyright © 2016 Tuan PM. All rights reserved.
 //  Updated by NaviOcean on 01/04/18
+//  Updated by Scott Spitler of KUHMUTE on 03/01/2021.
+//  Copyright © 2021 Scott Spitler. All rights reserved.
 //
 
 #import "Mqtt.h"
@@ -180,6 +182,46 @@
     [self.manager disconnectWithDisconnectHandler:^(NSError *error) {
     }];
     
+}
+
+- (BOOL) isConnected {
+    //NSLog(@"Trying to check for connection...");
+    if(self.manager.session.status == MQTTSessionStatusConnected) {
+        return true;
+    }
+    return false;
+}
+
+- (BOOL) isSubbed:(NSString *)topic {
+    //NSLog(@"Checking to see if listening to topic... %@", topic);
+    if([self.manager.subscriptions objectForKey:topic]) {
+        return true;
+    }
+    return false;
+}
+/*
+    Returns array of objects with keys:
+        -topic: type string
+        -qos  : type int
+
+    TODO:
+        Allocate all space before hand, remove "tmp" holding variable.
+        Still learning Objective C...
+*/
+
+- (NSMutableArray *) getTopics {
+    //NSLog(@"Trying to pull all connected topics....");
+    NSMutableArray * ret;
+    int i = 0;
+    for(id key in self.manager.subscriptions) {
+        id keySet = [NSDictionary sharedKeySetForKeys:@[@"topic", @"qos"]]
+        NSMutableDictionary *tmp = [NSMutableDictionary dictionaryWithSharedKeySet:keySet];
+        tmp[@"topic"] = key;
+        tmp[@"qos"] = [self.manager.subscriptions objectForKey:key];
+        ret[i] = tmp;
+        i++;
+    }
+    return ret;
 }
 
 - (void) subscribe:(NSString *)topic qos:(NSNumber *)qos {

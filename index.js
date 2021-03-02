@@ -49,8 +49,17 @@ MqttClient.prototype.publish = function(topic, payload, qos, retain) {
 MqttClient.prototype.reconnect = function() {
   Mqtt.reconnect(this.clientRef);
 };
+
 MqttClient.prototype.isConnected = function() {
   return Mqtt.isConnected(this.clientRef);
+};
+
+MqttClient.prototype.getTopics = function() {
+  return Mqtt.getTopics(this.clientRef);
+};
+
+MqttClient.prototype.isSubbed = function(topic) {
+  return Mqtt.isSubbed(this.clientRef, topic);
 };
 
 const emitter = new NativeEventEmitter(Mqtt)
@@ -65,7 +74,7 @@ module.exports = {
   },
   createClient: async function(options) {
     if(options.uri) {
-      var pattern = /^((mqtt[s]?|ws[s]?)?:(\/\/)([a-z0-9A-Z_\.\-]*):?(\d+))$/;
+			var pattern = /^((mqtt[s]?|ws[s]?)?:(\/\/)([0-9a-zA-Z_\.\-]*):?(\d+))$/;
       var matches = options.uri.match(pattern);
       if (!matches) {
         throw new Error(`Uri passed to createClient ${options.uri} doesn't match a known protocol (mqtt:// or ws://).`);
