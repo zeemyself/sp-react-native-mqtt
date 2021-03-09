@@ -1,6 +1,6 @@
 {
   "name": "sp-react-native-mqtt",
-  "version": "0.4.26",
+  "version": "0.4.27",
   "description": "MQTT client for react-native",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/spit4520/react-native-mqtt.git"
+		"url": "git+https://github.com/SudoPlz/react-native-mqtt.git"
   },
   "keywords": [
     "mqtt",
@@ -16,9 +16,9 @@
     "iot"
   ],
   "author": {
-    "name": "Scott Joseph Spitler II",
-    "email": "scott@kuhmute.com",
-    "url": "https://www.linkedin.com/in/sspitler"
+    "name": "Ioannis Kokkinidis",
+    "email": "sudoplz@gmail.com",
+    "url": "https://www.linkedin.com/in/sudoplz"
   },
   "contributors": [
     {

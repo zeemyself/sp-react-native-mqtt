@@ -214,7 +214,7 @@
     NSMutableArray * ret;
     int i = 0;
     for(id key in self.manager.subscriptions) {
-        id keySet = [NSDictionary sharedKeySetForKeys:@[@"topic", @"qos"]]
+        id keySet = [NSDictionary sharedKeySetForKeys:@[@"topic", @"qos"]];
         NSMutableDictionary *tmp = [NSMutableDictionary dictionaryWithSharedKeySet:keySet];
         tmp[@"topic"] = key;
         tmp[@"qos"] = [self.manager.subscriptions objectForKey:key];
