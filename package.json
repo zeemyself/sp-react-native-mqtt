@@ -1,6 +1,6 @@
 {
   "name": "sp-react-native-mqtt",
-  "version": "0.4.26",
+  "version": "0.4.27",
   "description": "MQTT client for react-native",
   "main": "index.js",
   "scripts": {
@@ -40,6 +40,11 @@
       "name": "taoqf",
       "email": "tao_qiufeng@126.com",
       "url": "http://github.com/taoqf"
+    },
+    {
+      "name": "Scott Spitler",
+      "email": "scott@kuhmute.com",
+      "url": "https://kuhmute.dev"
     }
   ],
   "license": "MIT",

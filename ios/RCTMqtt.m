@@ -4,13 +4,15 @@
 //
 //  Created by Tuan PM on 2/2/16.
 //  Copyright © 2016 Tuan PM. All rights reserved.
+//  Updated by Scott Spitler of KUHMUTE on 03/01/2021.
+//  Copyright © 2021 Scott Spitler. All rights reserved.
 //
-
+//Package dependencies
 #import <React/RCTBridgeModule.h>
 #import <React/RCTLog.h>
 #import <React/RCTUtils.h>
 #import <React/RCTEventDispatcher.h>
-
+//Project imports
 #import "RCTMqtt.h"
 #import "Mqtt.h"
 
@@ -90,6 +92,45 @@ RCT_EXPORT_METHOD(connect:(nonnull NSString *) clientRef) {
 RCT_EXPORT_METHOD(disconnect:(nonnull NSString *) clientRef) {
     [[[self clients] objectForKey:clientRef] disconnect];
 }
+
+RCT_EXPORT_METHOD(isConnected:(nonnull NSString *) clientRef resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    //RCTLogInfo(@"Bridge handling call to core for isConnected");
+    if([[self clients] objectForKey:clientRef]) {
+        BOOL conn = [[[self clients] objectForKey:clientRef] isConnected];
+        //RCTLogInfo(@"Client: %@ isConnected: %s", clientRef, conn ? "true" : "false");
+        resolve(@(conn));
+    } else {
+        NSError *error = [[NSError alloc] initWithDomain:@"com.kuhmute.kca" code:404 userInfo:@{@"Error reason": @"Client Not Found"}];
+        reject(@"client_not_found", @"This client doesn't exist", error);
+    }
+}
+
+RCT_EXPORT_METHOD(isSubbed:(nonnull NSString *) clientRef:(nonnull NSString*)topic resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    //RCTLogInfo(@"Bridge handling call to core for topic: %@", topic);
+    if([[self clients] objectForKey:clientRef]) {
+        BOOL subbed = [[[self clients] objectForKey:clientRef] isSubbed:clientRef];
+        //RCTLogInfo(@"Client: %@ isSubbed: %s", clientRef, subbed ? "true" : "false");
+        resolve(@(subbed));
+    } else {
+        
+        NSError *error = [[NSError alloc] initWithDomain:@"com.kuhmute.kca" code:404 userInfo:@{@"Error reason": @"Client Not Found"}];
+        reject(@"client_not_found", @"This client doesn't exist", error);
+    }
+}
+
+RCT_EXPORT_METHOD(getTopics:(nonnull NSString *) clientRef resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    //RCTLogInfo(@"Bridge handling call to core for client: %@", clientRef);
+    if([[self clients] objectForKey:clientRef]) {
+        NSMutableArray *ret = [[[self clients] objectForKey:clientRef] getTopics];
+        //RCTLogInfo(@"Client: %@ topics: %@", clientRef, ret);
+        resolve(ret);
+    } else {
+        NSError *error = [[NSError alloc] initWithDomain:@"com.kuhmute.kca" code:404 userInfo:@{@"Error reason": @"Client Not Found"}];
+        reject(@"client_not_found", @"This client doesn't exist", error);
+    }
+}
+
+
 
 RCT_EXPORT_METHOD(disconnectAll) {
     if (self.clients.count > 0) {

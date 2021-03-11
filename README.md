@@ -154,6 +154,16 @@ MQTT.createClient({
 
 * [ ] Use WeakReference for timer
 * [ ] Add disconnecting event
+* [ ] Add async versions of:
+ - [ ] connect
+ - [ ] subscribe
+ - [ ] disconnect
+ - [ ] unsubscribe
+
+* [X] Allow for multi nested domains ie: na.est.example.com
+* [X] Add isConnected implementation for iOS
+* [X] Add isSubbed for iOS & Android
+* [X] Add getTopics for iOS & Android
 
 ## LICENSE
 

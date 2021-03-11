@@ -8,7 +8,9 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.modules.core.RCTNativeAppEventEmitter;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -234,6 +236,27 @@ public class RCTMqtt implements MqttCallbackExtended {
     public boolean isConnected() {
         return client.isConnected();
     }
+	/*
+	 * Returns all connected topics as object
+	 */
+	public WritableArray getTopics() {
+		WritableArray ret = new WritableNativeArray();
+		for(Map.Entry<String, Integer> entry : topics.entrySet()) {
+			WritableMap tmp = Arguments.createMap();
+			tmp.putString("topic", entry.getKey());
+			tmp.putInt("qos", entry.getValue());
+			ret.pushMap(tmp);
+		}
+		return ret;
+	}
+
+	/*
+	 *  Check if listening to a specifc topic
+	 */
+	public boolean isSubbed(String topic) {
+		//log("isSubbed. checking is topic: "+ topic);
+		return topics.containsKey(topic);
+	}
 
     public void connect() {
         try {

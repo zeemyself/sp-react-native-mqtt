@@ -21,6 +21,9 @@
                 clientRef:(NSString *) clientRef;
 - (void) connect;
 - (void) disconnect;
+- (BOOL) isConnected;
+- (BOOL) isSubbed:(NSString *) topic;
+- (NSMutableArray *) getTopics;
 - (void) subscribe:(NSString *)topic qos:(NSNumber *)qos;
 - (void) unsubscribe:(NSString *)topic;
 - (void) publish:(NSString *) topic data:(NSData *)data qos:(NSNumber *)qos retain:(BOOL) retain;
