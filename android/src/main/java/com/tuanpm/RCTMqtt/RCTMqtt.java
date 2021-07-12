@@ -1,16 +1,18 @@
 package com.tuanpm.RCTMqtt;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.RCTNativeAppEventEmitter;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -25,21 +27,9 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.UnsupportedEncodingException;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.annotation.Nullable;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.X509TrustManager;
 
 public class RCTMqtt implements MqttCallbackExtended {
     private static final String TAG = "RCTMqttModule";
@@ -152,36 +142,6 @@ public class RCTMqtt implements MqttCallbackExtended {
         StringBuilder uri = new StringBuilder("tcp://");
         if (options.getBoolean("tls")) {
             uri = new StringBuilder("ssl://");
-            try {
-                /*
-                 * http://stackoverflow.com/questions/3761737/https-get-ssl-with-android-and-
-                 * self-signed-server-certificate
-                 *
-                 * WARNING: for anybody else arriving at this answer, this is a dirty, horrible
-                 * hack and you must not use it for anything that matters. SSL/TLS without
-                 * authentication is worse than no encryption at all - reading and modifying
-                 * your "encrypted" data is trivial for an attacker and you wouldn't even know
-                 * it was happening
-                 */
-                SSLContext sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, new X509TrustManager[] { new X509TrustManager() {
-                    public void checkClientTrusted(X509Certificate[] chain, String authType)
-                            throws CertificateException {
-                    }
-
-                    public void checkServerTrusted(X509Certificate[] chain, String authType)
-                            throws CertificateException {
-                    }
-
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[0];
-                    }
-                } }, new SecureRandom());
-
-                mqttOptions.setSocketFactory(sslContext.getSocketFactory());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
         uri.append(options.getString("host")).append(":").append(options.getInt("port"));
