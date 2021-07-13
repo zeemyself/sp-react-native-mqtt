@@ -14,6 +14,7 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.RCTNativeAppEventEmitter;
 
+import org.conscrypt.Conscrypt;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -26,6 +27,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -149,10 +152,13 @@ public class RCTMqtt implements MqttCallbackExtended {
             uri = new StringBuilder("ssl://");
 
             if (!options.getString("alpn").isEmpty()) {
-                mqttOptions.setSocketFactory(new AlpnSSLSocketFactory(
-                        (SSLSocketFactory) SSLSocketFactory.getDefault(),
-                        new String[]{options.getString("alpn")}
-                ));
+                try {
+                    mqttOptions.setSocketFactory(new AlpnSSLSocketFactory(
+                            new String[]{options.getString("alpn")}
+                    ));
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
