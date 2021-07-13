@@ -18,7 +18,7 @@ export interface ClientOptions {
 	willMsg?: string;	// only used when will is true
 	willtopic?: string;	// only used when will is true
 	willQos?: QoS;	// only used when will is true
-	willRetainFlag: boolean;	// only used when will is true
+	willRetainFlag?: boolean;	// only used when will is true
 	automaticReconnect?: boolean;	// android only
 }
 
