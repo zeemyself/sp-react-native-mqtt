@@ -81,6 +81,9 @@ public class RCTMqtt implements MqttCallbackExtended {
         if (params.hasKey("tls")) {
             defaultOptions.putBoolean("tls", params.getBoolean("tls"));
         }
+        if (params.hasKey("alpn")) {
+            defaultOptions.putString("alpn", params.getString("alpn"));
+        }
         if (params.hasKey("keepalive")) {
             defaultOptions.putInt("keepalive", params.getInt("keepalive"));
         }
