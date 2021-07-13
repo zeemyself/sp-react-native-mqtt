@@ -6,17 +6,27 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import javax.net.SocketFactory;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
-public class AlpnSSLSocketFactory extends SocketFactory {
-    protected SocketFactory parent;
+public class AlpnSSLSocketFactory extends SSLSocketFactory {
+    protected SSLSocketFactory parent;
     protected String[] alpn;
 
-    public AlpnSSLSocketFactory(@NonNull SocketFactory parent, @NonNull String[] alpn) {
+    public AlpnSSLSocketFactory(@NonNull SSLSocketFactory parent, @NonNull String[] alpn) {
         this.parent = parent;
         this.alpn = alpn;
+    }
+
+    @Override
+    public String[] getDefaultCipherSuites() {
+        return parent.getDefaultCipherSuites();
+    }
+
+    @Override
+    public String[] getSupportedCipherSuites() {
+        return parent.getSupportedCipherSuites();
     }
 
     @Override
@@ -50,6 +60,13 @@ public class AlpnSSLSocketFactory extends SocketFactory {
     @Override
     public Socket createSocket(InetAddress host, int port, InetAddress localHost, int localPort) throws IOException {
         Socket s = parent.createSocket(host, port, localHost, localPort);
+        setSocketOption(s);
+        return s;
+    }
+
+    @Override
+    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException {
+        Socket s = parent.createSocket(socket, host, port, autoClose);
         setSocketOption(s);
         return s;
     }

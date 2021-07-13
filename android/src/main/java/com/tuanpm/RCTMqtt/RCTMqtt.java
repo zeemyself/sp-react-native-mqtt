@@ -150,10 +150,8 @@ public class RCTMqtt implements MqttCallbackExtended {
 
             if (!options.getString("alpn").isEmpty()) {
                 mqttOptions.setSocketFactory(new AlpnSSLSocketFactory(
-                        SSLSocketFactory.getDefault(),
-                        new String[]{
-                            options.getString("alpn")
-                        }
+                        (SSLSocketFactory) SSLSocketFactory.getDefault(),
+                        new String[]{options.getString("alpn")}
                 ));
             }
         }
