@@ -7,6 +7,7 @@ export interface ClientOptions {
 	port?: number;
 	protocol?: 'mqtt' | 'tcp' | 'wss' | 'mqtts' | 'ws';
 	tls?: boolean;
+	alpn?: string;
 	keepalive?: number;	// seconds
 	protocolLevel?: number;
 	clean?: boolean;

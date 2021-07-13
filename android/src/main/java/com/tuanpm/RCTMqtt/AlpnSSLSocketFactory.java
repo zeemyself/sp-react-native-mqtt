@@ -10,11 +10,11 @@ import javax.net.SocketFactory;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 
-public class ApnsSSLSocketFactory extends SocketFactory {
+public class AlpnSSLSocketFactory extends SocketFactory {
     protected SocketFactory parent;
     protected String[] apns;
 
-    public ApnsSSLSocketFactory(@NonNull SocketFactory parent, @NonNull String[] apns) {
+    public AlpnSSLSocketFactory(@NonNull SocketFactory parent, @NonNull String[] apns) {
         this.parent = parent;
         this.apns = apns;
     }

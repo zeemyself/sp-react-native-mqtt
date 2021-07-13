@@ -50,7 +50,7 @@ public class RCTMqtt implements MqttCallbackExtended {
         defaultOptions.putInt("port", 1883);
         defaultOptions.putString("protocol", "tcp");
         defaultOptions.putBoolean("tls", false);
-        defaultOptions.putString("apns", "");
+        defaultOptions.putString("alpn", "");
         defaultOptions.putInt("keepalive", 60);
         defaultOptions.putString("clientId", "react-native-mqtt");
         defaultOptions.putInt("protocolLevel", 4);
@@ -145,11 +145,11 @@ public class RCTMqtt implements MqttCallbackExtended {
         if (options.getBoolean("tls")) {
             uri = new StringBuilder("ssl://");
 
-            if (!options.getString("apns").isEmpty()) {
-                mqttOptions.setSocketFactory(new ApnsSSLSocketFactory(
+            if (!options.getString("alpn").isEmpty()) {
+                mqttOptions.setSocketFactory(new AlpnSSLSocketFactory(
                         SSLSocketFactory.getDefault(),
                         new String[]{
-                            options.getString("apns")
+                            options.getString("alpn")
                         }
                 ));
             }
