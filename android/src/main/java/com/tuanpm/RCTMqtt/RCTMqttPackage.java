@@ -16,12 +16,14 @@ public class RCTMqttPackage implements ReactPackage
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext)
     {
-
         List<NativeModule> modules = new ArrayList<>();
-
         modules.add(new RCTMqttModule(reactContext));
-
         return modules;
+    }
+
+    @Override
+    public List<Class<? extends JavaScriptModule>> createJSModules() {
+        return Collections.emptyList();
     }
 
 

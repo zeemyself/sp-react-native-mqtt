@@ -1,7 +1,6 @@
 package com.tuanpm.RCTMqtt;
 
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -31,6 +30,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.net.ssl.SSLSocketFactory;
+
 public class RCTMqtt implements MqttCallbackExtended {
     private static final String TAG = "RCTMqttModule";
     private final ReactApplicationContext reactContext;
@@ -49,6 +50,7 @@ public class RCTMqtt implements MqttCallbackExtended {
         defaultOptions.putInt("port", 1883);
         defaultOptions.putString("protocol", "tcp");
         defaultOptions.putBoolean("tls", false);
+        defaultOptions.putString("apns", "");
         defaultOptions.putInt("keepalive", 60);
         defaultOptions.putString("clientId", "react-native-mqtt");
         defaultOptions.putInt("protocolLevel", 4);
@@ -142,6 +144,15 @@ public class RCTMqtt implements MqttCallbackExtended {
         StringBuilder uri = new StringBuilder("tcp://");
         if (options.getBoolean("tls")) {
             uri = new StringBuilder("ssl://");
+
+            if (!options.getString("apns").isEmpty()) {
+                mqttOptions.setSocketFactory(new ApnsSSLSocketFactory(
+                        SSLSocketFactory.getDefault(),
+                        new String[]{
+                            options.getString("apns")
+                        }
+                ));
+            }
         }
 
         uri.append(options.getString("host")).append(":").append(options.getInt("port"));
