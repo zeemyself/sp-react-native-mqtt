@@ -12,11 +12,11 @@ import javax.net.ssl.SSLSocket;
 
 public class AlpnSSLSocketFactory extends SocketFactory {
     protected SocketFactory parent;
-    protected String[] apns;
+    protected String[] alpn;
 
-    public AlpnSSLSocketFactory(@NonNull SocketFactory parent, @NonNull String[] apns) {
+    public AlpnSSLSocketFactory(@NonNull SocketFactory parent, @NonNull String[] alpn) {
         this.parent = parent;
-        this.apns = apns;
+        this.alpn = alpn;
     }
 
     @Override
@@ -57,6 +57,7 @@ public class AlpnSSLSocketFactory extends SocketFactory {
     protected void setSocketOption(Socket socket) {
         SSLSocket ssl = (SSLSocket) socket;
         SSLParameters parameters = ssl.getSSLParameters();
-        parameters.setApplicationProtocols(apns);
+        parameters.setApplicationProtocols(alpn);
+        ssl.setSSLParameters(parameters);
     }
 }
