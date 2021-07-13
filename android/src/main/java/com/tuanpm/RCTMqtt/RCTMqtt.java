@@ -27,6 +27,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.UnsupportedEncodingException;
+import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.util.HashMap;
@@ -153,10 +154,10 @@ public class RCTMqtt implements MqttCallbackExtended {
 
             if (!options.getString("alpn").isEmpty()) {
                 try {
-                    mqttOptions.setSocketFactory(new AlpnSSLSocketFactory(
+                    mqttOptions.setSocketFactory(AlpnSSLSocketFactory.conscrypt(
                             new String[]{options.getString("alpn")}
                     ));
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException | KeyManagementException e) {
                     e.printStackTrace();
                 }
             }

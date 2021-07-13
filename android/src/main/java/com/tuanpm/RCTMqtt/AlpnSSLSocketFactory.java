@@ -7,7 +7,9 @@ import org.conscrypt.Conscrypt;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
@@ -22,8 +24,10 @@ public class AlpnSSLSocketFactory extends SSLSocketFactory {
      * Create AlpnSSLSocketFactory with shipped Conscrypt configured for TLS 1.2
      * @param alpn List of ALPN to negotiate
      */
-    public AlpnSSLSocketFactory(@NonNull String[] alpn) throws NoSuchAlgorithmException {
-        this(SSLContext.getInstance("TLSv1.2", Conscrypt.newProvider()).getSocketFactory(), alpn);
+    public static AlpnSSLSocketFactory conscrypt(@NonNull String[] alpn) throws NoSuchAlgorithmException, KeyManagementException {
+        SSLContext ctx = SSLContext.getInstance("TLSv1.2", Conscrypt.newProvider());
+        ctx.init(null, null, new SecureRandom());
+        return new AlpnSSLSocketFactory(ctx.getSocketFactory(), alpn);
     }
 
     /**
