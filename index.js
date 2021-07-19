@@ -2,96 +2,89 @@ import {
   NativeEventEmitter,
   NativeModules
 } from 'react-native';
+import { EventEmitter2 } from 'eventemitter2';
 
-var Mqtt = NativeModules.Mqtt;
+const Mqtt = NativeModules.Mqtt;
+const emitter = new NativeEventEmitter(Mqtt);
 
-var MqttClient = function(options, clientRef){
-  this.options = options;
-  this.clientRef = clientRef;
-  this.eventHandler = {};
+class MqttClient extends EventEmitter2 {
+  constructor(options, clientRef) {
+    super();
+    this.options = options;
+    this.clientRef = clientRef;
+    this._emitterSubscription = emitter.addListener('mqtt_events', this._dispatchEvent.bind(this))
+  }
 
-  this.dispatchEvent = function(data) {
-
-    if(data && data.clientRef == this.clientRef && data.event) {
-
-      if(this.eventHandler[data.event]) {
-        this.eventHandler[data.event](data.message);
-      }
+  _dispatchEvent(data) {
+    if(data && data.clientRef === this.clientRef && data.event){
+      this.emit(data.event, data.message);
     }
+  }
+
+  _destroy() {
+    emitter.removeSubscription(this._emitterSubscription);
+    Mqtt.removeClient(this.clientRef);
+  }
+
+  connect() {
+    Mqtt.connect(this.clientRef);
+  }
+
+  disconnect() {
+    Mqtt.disconnect(this.clientRef);
+  }
+
+  subscribe(topic, qos) {
+    Mqtt.subscribe(this.clientRef, topic, qos);
+  }
+
+  unsubscribe(topic) {
+    Mqtt.unsubscribe(this.clientRef, topic);
+  }
+
+  publish(topic, payload, qos, retain) {
+    Mqtt.publish(this.clientRef, topic, payload, qos, retain);
+  }
+
+  reconnect() {
+    Mqtt.reconnect(this.clientRef);
+  }
+
+  isConnected() {
+    return Mqtt.isConnected(this.clientRef);
+  }
+
+  getTopics() {
+    return Mqtt.getTopics(this.clientRef);
+  }
+
+  isSubbed(topic) {
+    return Mqtt.isSubbed(this.clientRef, topic);
   }
 }
 
-MqttClient.prototype.on = function (event, callback) {
-  console.log('setup event', event);
-  this.eventHandler[event] = callback;
-}
-
-MqttClient.prototype.connect = function () {
-  Mqtt.connect(this.clientRef);
-}
-
-MqttClient.prototype.disconnect = function () {
-  Mqtt.disconnect(this.clientRef);
-}
-
-MqttClient.prototype.subscribe = function (topic, qos) {
-  Mqtt.subscribe(this.clientRef, topic, qos);
-}
-
-MqttClient.prototype.unsubscribe = function (topic) {
-  Mqtt.unsubscribe(this.clientRef, topic);
-}
-
-MqttClient.prototype.publish = function(topic, payload, qos, retain) {
-  Mqtt.publish(this.clientRef, topic, payload, qos, retain);
-}
-
-MqttClient.prototype.reconnect = function() {
-  Mqtt.reconnect(this.clientRef);
-};
-
-MqttClient.prototype.isConnected = function() {
-  return Mqtt.isConnected(this.clientRef);
-};
-
-MqttClient.prototype.getTopics = function() {
-  return Mqtt.getTopics(this.clientRef);
-};
-
-MqttClient.prototype.isSubbed = function(topic) {
-  return Mqtt.isSubbed(this.clientRef, topic);
-};
-
-const emitter = new NativeEventEmitter(Mqtt)
-
 module.exports = {
   clients: [],
-  eventHandler: null,
-  dispatchEvents: function(data) {
-    this.clients.forEach(function(client) {
-      client.dispatchEvent(data);
-    });
-  },
+
   createClient: async function(options) {
     if(options.uri) {
-			var pattern = /^((mqtt[s]?|ws[s]?)?:(\/\/)([0-9a-zA-Z_\.\-]*):?(\d+))$/;
-      var matches = options.uri.match(pattern);
+      let pattern = /^((mqtt[s]?|ws[s]?)?:(\/\/)([0-9a-zA-Z_.\-]*):?(\d+))$/;
+      let matches = options.uri.match(pattern);
       if (!matches) {
         throw new Error(`Uri passed to createClient ${options.uri} doesn't match a known protocol (mqtt:// or ws://).`);
       }
-      var protocol = matches[2];
-      var host = matches[4];
-      var port =  matches[5];
+      let protocol = matches[2];
+      let host = matches[4];
+      let port =  matches[5];
 
-      options.port = parseInt(port);
+      options.port = parseInt(port, 10);
       options.host = host;
       options.protocol = 'tcp';
 
-
-      if(protocol == 'wss' || protocol == 'mqtts') {
+      if(protocol === 'wss' || protocol === 'mqtts') {
         options.tls = true;
       }
-      if(protocol == 'ws' || protocol == 'wss') {
+      if(protocol === 'ws' || protocol === 'wss') {
         options.protocol = 'ws';
       }
 
@@ -99,31 +92,21 @@ module.exports = {
 
     let clientRef = await Mqtt.createClient(options);
 
-    var client = new MqttClient(options, clientRef);
+    let client = new MqttClient(options, clientRef);
 
-    /* Listen mqtt event */
-    if(this.eventHandler === null) {
-      console.log('add mqtt_events listener')
-      this.eventHandler = emitter.addListener(
-        "mqtt_events",
-        (data) => this.dispatchEvents(data));
-    }
     this.clients.push(client);
 
     return client;
   },
+
   removeClient: function(client) {
-    var clientIdx = this.clients.indexOf(client);
+    let clientIdx = this.clients.indexOf(client);
 
-    if(clientIdx > -1)
+    if(clientIdx > -1) {
       this.clients.splice(clientIdx, 1);
-
-    if(this.clients.length > 0) {
-      this.eventHandler.remove();
-      this.eventHandler = null;
     }
 
-    Mqtt.removeClient(client.clientRef);
+    client._destroy();
   },
 
   disconnectAll: function () {

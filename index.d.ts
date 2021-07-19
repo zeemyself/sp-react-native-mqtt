@@ -1,3 +1,5 @@
+import {EventEmitter2, Listener, OnOptions} from "eventemitter2";
+
 export type QoS = 0 | 1 | 2;
 
 export interface ClientOptions {
@@ -22,17 +24,19 @@ export interface ClientOptions {
 	automaticReconnect?: boolean;	// android only
 }
 
-export class IMqttClient {
+export interface Message {
+	data: string;
+	qos: QoS;
+	retain: boolean;
+	topic: string;
+}
+
+export class IMqttClient extends EventEmitter2 {
 	constructor(options: ClientOptions)
-	on(event: 'closed', cb: (msg: string) => void): void
-	on(event: 'error', cb: (msg: string) => void): void
-	on(event: 'message', cb: (msg: {
-		data: string;
-		qos: QoS;
-		retain: boolean;
-		topic: string;
-	}) => void): void
-	on(event: 'connect', cb: (msg: { reconnect: boolean; }) => void): void
+	on(event: 'closed', cb: (msg: string) => void, options?: boolean|OnOptions): Listener
+	on(event: 'error', cb: (msg: string) => void, options?: boolean|OnOptions): Listener
+	on(event: 'message', cb: (msg: Message) => void, options?: boolean|OnOptions): Listener
+	on(event: 'connect', cb: (msg: { reconnect: boolean; }) => void, options?: boolean|OnOptions): Listener
 	connect(): void;
 	disconnect(): void;
 	subscribe(topic: string, qos: QoS): void;
