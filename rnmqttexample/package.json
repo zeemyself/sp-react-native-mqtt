@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "react": "16.8.3",
-    "react-native": "0.59.9",
+    "react-native": "0.72.6",
     "sp-react-native-mqtt": "^0.4.25",
     "underscore": "^1.9.1"
   },
